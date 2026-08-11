@@ -2,6 +2,8 @@
 // Eid-ul-Adha Lunch & Family Gathering 2026
 // UPDATED: 27th May 2026, Wednesday
 
+
+//test
 export const islahtrustConfig = {
   // ============================================
   // ORGANIZATION IDENTITY
