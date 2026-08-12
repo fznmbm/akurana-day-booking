@@ -4,9 +4,12 @@ import { useState, useEffect } from "react";
 import { useConfig } from "../contexts/ConfigContext";
 
 export default function Home() {
-  const config = useConfig();
-
+  // ✅ STEP 1: Declare selectedOrg FIRST
+  const [selectedOrg, setSelectedOrg] = useState("ahhc");
+  
+  // ✅ STEP 2: Declare formData SECOND
   const [formData, setFormData] = useState({
+    organization: "ahhc",
     name: "",
     phone: "",
     email: "",
@@ -16,6 +19,37 @@ export default function Home() {
     paymentReference: "",
     notes: "",
   });
+
+  // ✅ STEP 3: Declare config THIRD - initialize with contextConfig so never null
+  const contextConfig = useConfig();
+  const [config, setConfig] = useState(contextConfig);
+
+  // ✅ STEP 4: NOW useEffect can use selectedOrg safely
+  useEffect(() => {
+    const loadConfig = async () => {
+      try {
+        let selectedConfig;
+        if (selectedOrg === "ahhc") {
+          const { ahhcConfig } = await import("../config/organizations/ahhc.config");
+          selectedConfig = ahhcConfig;
+        } else if (selectedOrg === "auf") {
+          const { aufConfig } = await import("../config/organizations/auf.config");
+          selectedConfig = aufConfig;
+        } else if (selectedOrg === "awauk") {
+          const { awaukConfig } = await import("../config/organizations/awauk.config");
+          selectedConfig = awaukConfig;
+        } else {
+          selectedConfig = contextConfig;
+        }
+        setConfig(selectedConfig);
+      } catch (error) {
+        console.error("Error loading config:", error);
+        setConfig(contextConfig);
+      }
+    };
+
+    loadConfig();
+  }, [selectedOrg, contextConfig]);
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
@@ -76,7 +110,10 @@ export default function Home() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          organization: selectedOrg,  // ADD THIS
+        }),
       });
 
       const data = await response.json();
@@ -187,6 +224,66 @@ export default function Home() {
               }}
             />
           </div>
+
+          {/* Organization Selector */}
+        <div style={{ marginBottom: "20px" }}>
+          <label
+            style={{
+              display: "block",
+              color: "#f3f4f6",
+              marginBottom: "8px",
+              fontSize: "0.875rem",
+              fontWeight: "600",
+              textTransform: "uppercase",
+              letterSpacing: "0.5px",
+            }}
+          >
+            Select Your Organization *
+          </label>
+          <select
+            value={selectedOrg}
+            onChange={(e) => {
+              setSelectedOrg(e.target.value);
+              setFormData({
+                organization: e.target.value,
+                name: "",
+                phone: "",
+                email: "",
+                under5: 0,
+                age5to12: 0,
+                age12plus: 0,
+                paymentReference: "",
+                notes: "",
+              });
+            }}
+            style={{
+              width: "100%",
+              padding: "12px",
+              background: "#111827",
+              border: "2px solid #374151",
+              borderRadius: "8px",
+              color: "#f3f4f6",
+              fontSize: "1rem",
+              fontWeight: "600",
+              outline: "none",
+              cursor: "pointer",
+              boxSizing: "border-box",
+              transition: "all 0.2s",
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = "#667eea";
+              e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = "#374151";
+              e.currentTarget.style.boxShadow = "none";
+            }}
+          >
+            <option value="ahhc">🏠 AHHC - Crawley</option>
+            <option value="auf">🌍 AUF - London</option>
+            <option value="awauk">🌟 AWA-UK - Leicester</option>
+          </select>
+        </div>
 
           <h1
             style={{

@@ -1,26 +1,27 @@
-// AHHC Organization Configuration
-// Akurana Helping Hands Crawley - Family Get-Together 2026
+// AUF Organization Configuration
+// Akurana United Foundation - London
+// Akurana Day 2026 - 26th September
 
-export const ahhcConfig = {
+export const aufConfig = {
   // ============================================
   // ORGANIZATION IDENTITY
   // ============================================
   organization: {
-    id: "ahhc",
-    slug: "ahhc", // Used in URLs
-    name: "AHHC",
-    fullName: "Akurana Helping Hands Crawley",
-    tagline: "Family Get-Together 2026",
-    logo: "/logos/ahhc-logo.png",
-    website: "https://elitestack.co.uk/ahhc",
-    contactEmail: "admin@ahhc.org",
-    contactPhone: "+44 123 456 7890",
+    id: "auf",
+    slug: "auf",
+    name: "AUF",
+    fullName: "Akurana United Foundation",
+    tagline: "Akurana Day 2026",
+    logo: "/logos/auf-logo.png",
+    website: "https://akuranaday.co.uk",
+    contactEmail: "admin@auf.org",
+    contactPhone: "+44 7700 123456",
   },
 
   // ============================================
   // EVENT DETAILS
   // ============================================
-event: {
+  event: {
     name: "Akurana Day 2026 - Grand Get Together",
     fullName: "Akurana Day 2026 - All UK Akuranaites Grand Get Together",
     date: "2026-09-26T13:00:00Z",
@@ -29,12 +30,14 @@ event: {
     time: "13:00 - 20:00",
     venue: "Claremont High School",
     venueAddress: "Claremont Avenue, Harrow, HA3 0UH",
-    capacity: 1500,
+    capacity: 300,
+    
+    // RSVP Settings
     rsvpDeadline: "2026-09-15T22:00:00.000Z",
     rsvpEnabled: true,
     
     // Status
-    status: "active", // draft, active, closed
+    status: "active",
   },
 
   // ============================================
@@ -52,7 +55,7 @@ event: {
         ageMin: 0,
         ageMax: 4,
         description: "Free entry for children under 5",
-        formField: "under5", // Database field name
+        formField: "under5",
       },
       {
         id: "child",
@@ -79,19 +82,16 @@ event: {
   // PAYMENT INFORMATION
   // ============================================
   payment: {
-    bankName: "HSBC UK",
-    accountName: "AHHC Events",
-    sortCode: "40-47-84",
-    accountNumber: "12345678",
-    reference: "Your Name", // Attendees should use their name as reference
+    bankName: "HSBC",
+    accountName: "AKURANA UNITED FOUNDATION",
+    sortCode: "40-01-13",
+    accountNumber: "41729233",
+    reference: "Your Name",
     
     instructions: [
-      "Please use your NAME as the payment reference",
-      "Payment must be received before the RSVP deadline",
-      "You will receive a QR code after payment confirmation",
+      "After payment, send receipt to Br. Ahmed on 07700 123456",
     ],
     
-    // Display in RSVP form
     showBankDetails: true,
   },
 
@@ -99,61 +99,53 @@ event: {
   // FEATURES TOGGLE
   // ============================================
   features: {
-    // Core Features
     enableRSVP: true,
     enableCheckIn: true,
     enableQRCodes: true,
-    
-    // Meal Management System
-    enableMealManagement: true, // ← TOGGLE FOR MEALS
-    
-    // Additional Features
+    enableMealManagement: true,
     enableWhatsAppShare: true,
     enableCSVExport: true,
     enablePublicDisplay: true,
     enableVolunteerScanner: true,
-    
-    // Branding
     showPoweredBy: true,
   },
 
   // ============================================
-  // MEAL MANAGEMENT (Only if enabled)
+  // MEAL MANAGEMENT
   // ============================================
   meals: {
-deadline: "2026-09-12T22:00:00Z",
-deadlineDisplay: "12th September 2026, 10:00 PM",
+    deadline: "2026-09-12T22:00:00Z",
+    deadlineDisplay: "12th September 2026, 10:00 PM",
     
     options: [
-  {
-    id: "rice-curry",
-    name: "Rice & Curry",
-    description: "Traditional curry with rice",
-    available: true,
-  },
-  {
-    id: "burger-meal",
-    name: "Burger Meal",
-    description: "Burger with fries",
-    available: true,
-  },
-  {
-    id: "nuggets-chips",
-    name: "Nuggets & Chips",
-    description: "Chicken nuggets with chips (Under 5s)",
-    available: true,
-  },
-  {
-    id: "not-required",
-    name: "Not Required",
-    description: "No meal needed",
-    available: true,
-  },
+      {
+        id: "rice-curry",
+        name: "Rice & Curry",
+        description: "Traditional curry with rice",
+        available: true,
+      },
+      {
+        id: "burger-meal",
+        name: "Burger Meal",
+        description: "Burger Meal",
+        available: true,
+      },
+      {
+        id: "nuggets-chips",
+        name: "Nuggets & Chips",
+        description: "Chicken nuggets with chips (Under 5s)",
+        available: true,
+      },
+      {
+        id: "not-required",
+        name: "Not Required",
+        description: "No meal needed",
+        available: true,
+      },
     ],
     
     allowDietaryRequirements: true,
     dietaryRequirementsLabel: "Any dietary requirements or allergies?",
-    
     confirmationMessage: "Thank you! Your meal selection has been saved.",
   },
 
@@ -161,29 +153,22 @@ deadlineDisplay: "12th September 2026, 10:00 PM",
   // THEME / BRANDING
   // ============================================
   theme: {
-    // Primary Colors
-    primaryColor: "#667eea",
-    secondaryColor: "#10b981",
-    accentColor: "#ec4899",
-    
-    // Background Colors
+    primaryColor: "#10b981",
+    secondaryColor: "#059669",
+    accentColor: "#f59e0b",
     darkBg: "#111827",
     lightBg: "#1f2937",
     cardBg: "#1f2937",
-    
-    // Text Colors
     textPrimary: "#f9fafb",
     textSecondary: "#9ca3af",
-    
-    // Gradients
-    gradientStart: "#667eea",
-    gradientEnd: "#10b981",
+    gradientStart: "#10b981",
+    gradientEnd: "#059669",
   },
 
   // ============================================
   // DATABASE CONFIGURATION
   // ============================================
-database: {
+  database: {
     name: "akuranaday",
     collections: {
       rsvps: "rsvps",
@@ -200,16 +185,14 @@ database: {
     poweredByText: "Developed by EliteStack.co.uk",
     poweredByLink: "https://elitestack.co.uk",
     showInFooter: true,
-    
-    // Custom Footer Text
     footerText: "© 2026 Akurana Day. All rights reserved.",
   },
 
   // ============================================
-  // EMAIL / NOTIFICATIONS (Future)
+  // EMAIL / NOTIFICATIONS
   // ============================================
   notifications: {
-    sendConfirmationEmail: false, // Future feature
+    sendConfirmationEmail: false,
     sendReminderEmail: false,
     sendQRCodeEmail: false,
   },
@@ -218,7 +201,7 @@ database: {
   // ADMIN SETTINGS
   // ============================================
   admin: {
-    defaultPassword: "admin123", // Change in production
-    sessionTimeout: 3600000, // 1 hour in milliseconds
+    defaultPassword: "admin123",
+    sessionTimeout: 3600000,
   },
-};
+};  

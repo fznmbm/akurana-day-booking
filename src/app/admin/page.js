@@ -105,6 +105,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [organizationFilter, setOrganizationFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedRows, setSelectedRows] = useState([]);
   const [sortBy, setSortBy] = useState("date");

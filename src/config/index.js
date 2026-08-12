@@ -6,9 +6,12 @@ export function getConfig() {
   if (orgId === "ahhc") {
     const { ahhcConfig } = require("./organizations/ahhc.config");
     config = ahhcConfig;
-  } else if (orgId === "islahtrust") {
-    const { islahtrustConfig } = require("./organizations/islahtrust.config");
-    config = islahtrustConfig;
+  } else if (orgId === "auf") {
+    const { aufConfig } = require("./organizations/auf.config");
+    config = aufConfig;
+  } else if (orgId === "awauk") {
+    const { awaukConfig } = require("./organizations/awauk.config");
+    config = awaukConfig;
   } else {
     throw new Error(`Unknown organization: ${orgId}`);
   }
