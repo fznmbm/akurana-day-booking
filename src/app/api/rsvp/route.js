@@ -29,15 +29,32 @@ export async function POST(request) {
       );
     }
 
-    // Calculate total amount from config pricing
-    const childTier = config.pricing.tiers.find((t) => t.id === "child");
-    const adultTier = config.pricing.tiers.find((t) => t.id === "adult");
+    // Get correct config based on organization selected by user
+    const orgId = body.organization || "ahhc";
+    let orgConfig;
+    if (orgId === "ahhc") {
+      const { ahhcConfig } = require("../../../config/organizations/ahhc.config");
+      orgConfig = ahhcConfig;
+    } else if (orgId === "auf") {
+      const { aufConfig } = require("../../../config/organizations/auf.config");
+      orgConfig = aufConfig;
+    } else if (orgId === "awauk") {
+      const { awaukConfig } = require("../../../config/organizations/awauk.config");
+      orgConfig = awaukConfig;
+    } else {
+      orgConfig = config;
+    }
+
+    // Calculate total amount from CORRECT org pricing
+    const childTier = orgConfig.pricing.tiers.find((t) => t.id === "child");
+    const adultTier = orgConfig.pricing.tiers.find((t) => t.id === "adult");
     const totalAmount =
       (body.age5to12 || 0) * childTier.price +
       (body.age12plus || 0) * adultTier.price;
 
-    // Create new RSVP
+    // Create new RSVP with organization field
     const rsvp = await Rsvp.create({
+      organization: orgId,
       name: body.name,
       phone: body.phone,
       email: body.email || "",

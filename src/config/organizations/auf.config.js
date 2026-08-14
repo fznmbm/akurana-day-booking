@@ -83,13 +83,13 @@ export const aufConfig = {
   // ============================================
   payment: {
     bankName: "HSBC",
-    accountName: "AKURANA UNITED FOUNDATION",
+    accountName: "AKURANA UNITED FOUNDATION UK",
     sortCode: "40-01-13",
     accountNumber: "41729233",
     reference: "Your Name",
     
     instructions: [
-      "After payment, send receipt to Br. Ahmed on 07700 123456",
+      "After payment, send receipt to Br. Zaheer on 07894544385",
     ],
     
     showBankDetails: true,

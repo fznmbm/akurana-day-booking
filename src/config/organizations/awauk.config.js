@@ -83,13 +83,13 @@ export const awaukConfig = {
   // ============================================
   payment: {
     bankName: "Barclays Bank",
-    accountName: "AWA-UK",
+    accountName: "AKURANA WELFARE ASSOCIATION UK",
     sortCode: "23-05-80",
     accountNumber: "45351769",
     reference: "Your Name",
     
     instructions: [
-      "After payment, send receipt to Br. Karim on 07700 654321",
+      "After payment, send receipt to Br. Imran on 07412522461",
     ],
     
     showBankDetails: true,

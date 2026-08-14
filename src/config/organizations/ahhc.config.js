@@ -80,15 +80,13 @@ event: {
   // ============================================
   payment: {
     bankName: "HSBC UK",
-    accountName: "AHHC Events",
-    sortCode: "40-47-84",
-    accountNumber: "12345678",
+    accountName: "AKURANA HELPING HANDS CRAWLEY",
+    sortCode: "40-18-22",
+    accountNumber: "92155494",
     reference: "Your Name", // Attendees should use their name as reference
     
     instructions: [
-      "Please use your NAME as the payment reference",
-      "Payment must be received before the RSVP deadline",
-      "You will receive a QR code after payment confirmation",
+      "After payment, send receipt to Br. Irshan on 07892804448",
     ],
     
     // Display in RSVP form

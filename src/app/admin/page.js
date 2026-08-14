@@ -1,3 +1,4 @@
+//src\app\admin\page.js
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -631,13 +632,20 @@ export default function AdminDashboard() {
 
   //add new version of copyForWhatsApp with better formatting and pending RSVPs included
 
-  const copyForWhatsApp = () => {
-    // Filter only paid RSVPs
-    const paidRsvps = rsvps
-      .filter((r) => r.paymentStatus === "paid")
-      .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)); // Sort by date
+const copyForWhatsApp = () => {
+    // Filter RSVPs by organization if filter is active
+    const orgFiltered = organizationFilter === "all" 
+      ? rsvps 
+      : rsvps.filter((r) => r.organization === organizationFilter);
 
-    const pendingRsvps = rsvps.filter((r) => r.paymentStatus === "pending");
+    const orgNames = { ahhc: "AHHC - Crawley", auf: "AUF - London", awauk: "AWA-UK - Leicester" };
+    const orgLabel = organizationFilter === "all" ? "All Organizations" : orgNames[organizationFilter];
+
+    const paidRsvps = orgFiltered
+      .filter((r) => r.paymentStatus === "paid")
+      .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+
+    const pendingRsvps = orgFiltered.filter((r) => r.paymentStatus === "pending");
     // const pendingPeople = pendingRsvps.reduce(
     //   (sum, r) => sum + r.under5 + r.age5to12 + r.age12plus,
     //   0
@@ -649,7 +657,7 @@ export default function AdminDashboard() {
     //message += `📍 St Wilfred School, Crawley\n\n`;
     //message += `━━━━━━━━━━━━━━━━━━━━\n`;
     let message = `✅ *CONFIRMED ATTENDEES (PAID)*\n`;
-    //message += `━━━━━━━━━━━━━━━━━━━━\n\n`;
+    message += `📍 ${orgLabel}\n`;
     message += `━━━━━━━━━━━━━━━━\n\n`;
 
     // List each attendee
@@ -760,10 +768,10 @@ export default function AdminDashboard() {
         if (!matchesSearch) return false;
       }
 
-      // 2. CHECK-IN MODE FILTER
-      // if (checkInMode) {
-      //   return rsvp.paymentStatus === "paid" && !rsvp.checkedIn;
-      // }
+      // 2. ORGANIZATION FILTER
+      if (organizationFilter !== "all") {
+        if (rsvp.organization !== organizationFilter) return false;
+      }
 
       // 3. STATUS FILTER
       if (statusFilter === "all") return true;
@@ -1720,138 +1728,222 @@ export default function AdminDashboard() {
             {mobileFiltersOpen ? "Hide Filters ▲" : "Show Filters ▼"}
           </button>
 
-          <div
-            style={{
-              display: "flex",
-              gap: "12px",
-              flexWrap: "wrap",
-              alignItems: "center",
-            }}
-            className={mobileFiltersOpen ? "mobile-filters-open" : ""}
-          >
-            <div style={{ flex: "1", minWidth: "200px", position: "relative" }}>
-              <input
-                type="text"
-                placeholder="🔍 Search name, phone, email..."
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setCurrentPage(1);
-                }}
-                style={{
-                  width: "100%",
-                  padding: "10px 14px",
-                  paddingRight: isSearching ? "40px" : "14px", // Space for spinner
-                  border: "1px solid #374151",
-                  borderRadius: "8px",
-                  fontSize: "0.875rem",
-                  outline: "none",
-                  background: "#111827",
-                  color: "#f3f4f6",
-                  transition: "padding-right 0.2s",
-                }}
-              />
-
-              {/* Loading Spinner */}
-              {isSearching && (
-                <div
-                  style={{
-                    position: "absolute",
-                    right: "12px",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    width: "16px",
-                    height: "16px",
-                    border: "2px solid #374151",
-                    borderTop: "2px solid #667eea",
-                    borderRadius: "50%",
-                    animation: "spin 0.6s linear infinite",
-                  }}
-                />
-              )}
-            </div>
-
-            <select
-              value={statusFilter}
+          {/* ROW 1: Search Bar - Full Width */}
+          <div style={{ position: "relative", marginBottom: "12px" }}>
+            <input
+              type="text"
+              placeholder="🔍 Search name, phone, email..."
+              value={search}
               onChange={(e) => {
-                setStatusFilter(e.target.value);
+                setSearch(e.target.value);
                 setCurrentPage(1);
               }}
               style={{
+                width: "100%",
                 padding: "10px 14px",
+                paddingRight: isSearching ? "40px" : "14px",
                 border: "1px solid #374151",
                 borderRadius: "8px",
                 fontSize: "0.875rem",
-                background: "#111827",
-                cursor: "pointer",
                 outline: "none",
-                color: "#f3f4f6",
-                minWidth: "120px",
-              }}
-            >
-              <option value="all">All Status</option>
-              <option value="pending">⏳ Pending</option>
-              <option value="paid">✅ Paid</option>
-              <option value="not-checked">⏸️ Not Checked</option>
-            </select>
-
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              style={{
-                padding: "10px 14px",
-                border: "1px solid #374151",
-                borderRadius: "8px",
-                fontSize: "0.875rem",
                 background: "#111827",
-                cursor: "pointer",
-                outline: "none",
                 color: "#f3f4f6",
-                minWidth: "120px",
+                boxSizing: "border-box",
               }}
-            >
-              <option value="date">By Date</option>
-              <option value="name">By Name</option>
-              <option value="amount">By Amount</option>
-            </select>
+            />
+            {isSearching && (
+              <div style={{
+                position: "absolute",
+                right: "12px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                width: "16px",
+                height: "16px",
+                border: "2px solid #374151",
+                borderTop: "2px solid #667eea",
+                borderRadius: "50%",
+                animation: "spin 0.6s linear infinite",
+              }} />
+            )}
+          </div>
 
-            <button
-              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-              style={{
-                padding: "10px 14px",
-                border: "1px solid #374151",
-                borderRadius: "8px",
-                fontSize: "0.875rem",
-                background: "#111827",
-                cursor: "pointer",
-                fontWeight: "600",
-                color: "#f3f4f6",
-                minWidth: "44px",
-              }}
-            >
-              {sortOrder === "asc" ? "↑" : "↓"}
-            </button>
+{/* FILTER ROWS - 2 row responsive layout */}
+          <div style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "8px",
+            width: "100%",
+          }}>
+            {/* ROW A: Org Buttons - 4 equal columns always */}
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(4, 1fr)",
+              gap: "6px",
+              width: "100%",
+            }}>
+              {[
+                { id: "all", label: "All", logo: null, count: rsvps.length, activeColor: "#ffffff", activeBg: "#667eea", activeBorder: "#667eea" },
+                { id: "ahhc", label: "AHHC", logo: "/logos/ahhc-logo.png", count: rsvps.filter(r => r.organization === "ahhc").length, activeColor: "#667eea", activeBg: "#1e3a5f", activeBorder: "#667eea" },
+                { id: "auf", label: "AUF", logo: "/logos/auf-logo.png", count: rsvps.filter(r => r.organization === "auf").length, activeColor: "#10b981", activeBg: "#064e3b", activeBorder: "#10b981" },
+                { id: "awauk", label: "AWA-UK", logo: "/logos/awauk-logo.png", count: rsvps.filter(r => r.organization === "awauk").length, activeColor: "#f59e0b", activeBg: "#3b1f0f", activeBorder: "#f59e0b" },
+              ].map((org) => (
+                <button
+                  key={org.id}
+                  onClick={() => {
+                    setOrganizationFilter(org.id);
+                    setCurrentPage(1);
+                  }}
+                  style={{
+                    padding: "10px 6px",
+                    background: organizationFilter === org.id ? org.activeBg : "#111827",
+                    border: `2px solid ${organizationFilter === org.id ? org.activeBorder : "#374151"}`,
+                    borderRadius: "8px",
+                    color: organizationFilter === org.id ? org.activeColor : "#9ca3af",
+                    fontWeight: "700",
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "4px",
+                    minWidth: 0,
+                  }}
+                >
+                  {org.logo ? (
+                    <img
+                      src={org.logo}
+                      alt={org.label}
+                      style={{
+                        width: "22px",
+                        height: "22px",
+                        borderRadius: "50%",
+                        objectFit: "contain",
+                        background: "white",
+                        padding: "2px",
+                        flexShrink: 0,
+                      }}
+                    />
+                  ) : (
+                    <span style={{ fontSize: "1rem" }}>🏢</span>
+                  )}
+                  <span style={{
+                    fontSize: "0.7rem",
+                    fontWeight: "700",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    width: "100%",
+                    textAlign: "center",
+                  }}>
+                    {org.label}
+                  </span>
+                  <span style={{
+                    background: organizationFilter === org.id ? `${org.activeColor}33` : "#374151",
+                    color: organizationFilter === org.id ? org.activeColor : "#6b7280",
+                    padding: "1px 6px",
+                    borderRadius: "10px",
+                    fontSize: "0.65rem",
+                    fontWeight: "700",
+                  }}>
+                    {org.count}
+                  </span>
+                </button>
+              ))}
+            </div>
 
-            {search && (
-              <button
-                onClick={() => {
-                  setSearch("");
+            {/* ROW B: Status + Sort + Controls - Full Width */}
+            <div style={{
+              display: "flex",
+              gap: "6px",
+              alignItems: "center",
+              width: "100%",
+            }}>
+              <select
+                value={statusFilter}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value);
                   setCurrentPage(1);
                 }}
                 style={{
-                  padding: "10px 14px",
-                  background: "#374151",
-                  border: "none",
+                  flex: "1",
+                  padding: "8px 6px",
+                  border: "1px solid #374151",
+                  borderRadius: "8px",
+                  fontSize: "0.8rem",
+                  background: "#111827",
+                  cursor: "pointer",
+                  outline: "none",
+                  color: "#f3f4f6",
+                  minWidth: 0,
+                }}
+              >
+                <option value="all">All Status</option>
+                <option value="pending">⏳ Pending</option>
+                <option value="paid">✅ Paid</option>
+                <option value="not-checked">⏸️ Not Checked</option>
+              </select>
+
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                style={{
+                  flex: "1",
+                  padding: "8px 6px",
+                  border: "1px solid #374151",
+                  borderRadius: "8px",
+                  fontSize: "0.8rem",
+                  background: "#111827",
+                  cursor: "pointer",
+                  outline: "none",
+                  color: "#f3f4f6",
+                  minWidth: 0,
+                }}
+              >
+                <option value="date">By Date</option>
+                <option value="name">By Name</option>
+                <option value="amount">By Amount</option>
+              </select>
+
+              <button
+                onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+                style={{
+                  padding: "8px 12px",
+                  border: "1px solid #374151",
                   borderRadius: "8px",
                   fontSize: "0.875rem",
+                  background: "#111827",
                   cursor: "pointer",
                   fontWeight: "600",
                   color: "#f3f4f6",
+                  flexShrink: 0,
                 }}
               >
-                Clear
+                {sortOrder === "asc" ? "↑" : "↓"}
               </button>
-            )}
+
+              {search && (
+                <button
+                  onClick={() => {
+                    setSearch("");
+                    setCurrentPage(1);
+                  }}
+                  style={{
+                    padding: "8px 12px",
+                    background: "#374151",
+                    border: "none",
+                    borderRadius: "8px",
+                    fontSize: "0.8rem",
+                    cursor: "pointer",
+                    fontWeight: "600",
+                    color: "#f3f4f6",
+                    flexShrink: 0,
+                  }}
+                >
+                  ✕
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Bulk Actions */}
@@ -2136,6 +2228,20 @@ export default function AdminDashboard() {
                                 }}
                               >
                                 {rsvp.email}
+                              </div>
+                            )}
+                            {rsvp.organization && (
+                              <div style={{
+                                marginTop: "4px",
+                                display: "inline-block",
+                                padding: "2px 8px",
+                                borderRadius: "4px",
+                                fontSize: "0.7rem",
+                                fontWeight: "700",
+                                background: rsvp.organization === "ahhc" ? "#1e3a5f" : rsvp.organization === "auf" ? "#064e3b" : "#3b1f0f",
+                                color: rsvp.organization === "ahhc" ? "#667eea" : rsvp.organization === "auf" ? "#10b981" : "#f59e0b",
+                              }}>
+                                {rsvp.organization === "ahhc" ? "🏠 AHHC" : rsvp.organization === "auf" ? "🌍 AUF" : "🌟 AWA-UK"}
                               </div>
                             )}
                           </div>

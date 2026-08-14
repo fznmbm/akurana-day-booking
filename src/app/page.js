@@ -1,3 +1,5 @@
+
+//src\app\page.js
 "use client";
 
 import { useState, useEffect } from "react";
@@ -196,7 +198,7 @@ export default function Home() {
       style={{
         background: "#111827",
         minHeight: "100vh",
-        padding: "24px",
+        padding: "clamp(12px, 4vw, 24px)",
         fontFamily: "system-ui, -apple-system, sans-serif",
       }}
     >
@@ -206,104 +208,235 @@ export default function Home() {
           margin: "0 auto",
           background: "#1f2937",
           borderRadius: "12px",
-          padding: "32px",
+          padding: "clamp(16px, 5vw, 32px)",
           border: "1px solid #374151",
           boxShadow: "0 4px 6px rgba(0,0,0,0.3)",
         }}
       >
         {/* Header Section */}
         <div style={{ textAlign: "center", marginBottom: "32px" }}>
-          <div style={{ marginBottom: "20px" }}>
-            <img
-              src="/logo.png"
-              alt="AHHC Logo"
-              style={{
-                width: "25%",
-                height: "25%",
-                objectFit: "cover",
-              }}
-            />
+
+          {/* 3 Logos Row */}
+          <div style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "16px",
+            marginBottom: "20px",
+          }}>
+            <img src="/logos/ahhc-logo.png" alt="AHHC" style={{ width: "70px", height: "70px", objectFit: "contain", borderRadius: "50%", background: "white", padding: "4px" }} />
+            <img src="/logos/auf-logo.png" alt="AUF" style={{ width: "70px", height: "70px", objectFit: "contain", borderRadius: "50%", background: "white", padding: "4px" }} />
+            <img src="/logos/awauk-logo.png" alt="AWA-UK" style={{ width: "70px", height: "70px", objectFit: "contain", borderRadius: "50%", background: "white", padding: "4px" }} />
           </div>
 
-          {/* Organization Selector */}
-        <div style={{ marginBottom: "20px" }}>
-          <label
-            style={{
-              display: "block",
-              color: "#f3f4f6",
-              marginBottom: "8px",
-              fontSize: "0.875rem",
-              fontWeight: "600",
-              textTransform: "uppercase",
-              letterSpacing: "0.5px",
-            }}
-          >
-            Select Your Organization *
-          </label>
-          <select
-            value={selectedOrg}
-            onChange={(e) => {
-              setSelectedOrg(e.target.value);
-              setFormData({
-                organization: e.target.value,
-                name: "",
-                phone: "",
-                email: "",
-                under5: 0,
-                age5to12: 0,
-                age12plus: 0,
-                paymentReference: "",
-                notes: "",
-              });
-            }}
-            style={{
-              width: "100%",
-              padding: "12px",
-              background: "#111827",
-              border: "2px solid #374151",
-              borderRadius: "8px",
-              color: "#f3f4f6",
-              fontSize: "1rem",
-              fontWeight: "600",
-              outline: "none",
-              cursor: "pointer",
-              boxSizing: "border-box",
-              transition: "all 0.2s",
-            }}
-            onFocus={(e) => {
-              e.currentTarget.style.borderColor = "#667eea";
-              e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102, 126, 234, 0.1)";
-            }}
-            onBlur={(e) => {
-              e.currentTarget.style.borderColor = "#374151";
-              e.currentTarget.style.boxShadow = "none";
-            }}
-          >
-            <option value="ahhc">🏠 AHHC - Crawley</option>
-            <option value="auf">🌍 AUF - London</option>
-            <option value="awauk">🌟 AWA-UK - Leicester</option>
-          </select>
-        </div>
-
-          <h1
-            style={{
-              color: "#667eea",
-              fontSize: "1.75rem",
-              marginBottom: "8px",
-              fontWeight: "700",
-            }}
-          >
-            {config.event.fullName}
+          {/* Event Title */}
+          <h1 style={{
+            color: "#667eea",
+            fontSize: "1.6rem",
+            marginBottom: "4px",
+            fontWeight: "800",
+            lineHeight: "1.3",
+          }}>
+            Akurana Day 2026
           </h1>
-          <p
-            style={{
-              color: "#9ca3af",
-              fontSize: "1rem",
-              margin: 0,
-            }}
-          >
-            {config.organization.fullName}
+          <p style={{
+            color: "#f3f4f6",
+            fontSize: "1rem",
+            fontWeight: "600",
+            marginBottom: "4px",
+          }}>
+            All UK Akuranaites Grand Get Together
           </p>
+          <p style={{
+            color: "#9ca3af",
+            fontSize: "0.875rem",
+            margin: "0 0 24px 0",
+          }}>
+            AWA-UK • AUF • AHHC
+          </p>
+
+          {/* Organization Selection - Card Style */}
+          <div style={{
+            marginTop: "8px",
+            paddingTop: "24px",
+            borderTop: "1px solid #374151",
+          }}>
+            <div style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              marginBottom: "16px",
+              justifyContent: "center",
+            }}>
+              <div style={{
+                height: "1px",
+                flex: 1,
+                background: "#374151",
+              }} />
+              <p style={{
+                color: "#f3f4f6",
+                fontSize: "0.875rem",
+                fontWeight: "700",
+                textTransform: "uppercase",
+                letterSpacing: "1.5px",
+                margin: 0,
+                whiteSpace: "nowrap",
+              }}>
+                I am booking from
+              </p>
+              <div style={{
+                height: "1px",
+                flex: 1,
+                background: "#374151",
+              }} />
+            </div>
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: "clamp(6px, 2vw, 10px)",
+            }}>
+              {[
+                { id: "ahhc", name: "AHHC", location: "Crawley", logo: "/logos/ahhc-logo.png" },
+                { id: "auf", name: "AUF", location: "London", logo: "/logos/auf-logo.png" },
+                { id: "awauk", name: "AWA-UK", location: "Leicester", logo: "/logos/awauk-logo.png" },
+              ].map((org) => (
+                <button
+                  key={org.id}
+                  onClick={() => {
+                    setSelectedOrg(org.id);
+                    setFormData({
+                      organization: org.id,
+                      name: "",
+                      phone: "",
+                      email: "",
+                      under5: 0,
+                      age5to12: 0,
+                      age12plus: 0,
+                      paymentReference: "",
+                      notes: "",
+                    });
+                  }}
+                  style={{
+                    padding: "clamp(8px, 2vw, 12px) clamp(4px, 1.5vw, 8px)",
+                    background: selectedOrg === org.id ? "#1e3a5f" : "#111827",
+                    border: selectedOrg === org.id ? "2px solid #667eea" : "2px solid #374151",
+                    borderRadius: "12px",
+                    cursor: "pointer",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: "6px",
+                    transition: "all 0.2s",
+                    boxShadow: selectedOrg === org.id ? "0 0 0 3px rgba(102,126,234,0.2)" : "none",
+                    width: "100%",
+                  }}
+                >
+                  <img
+                    src={org.logo}
+                    alt={org.name}
+                    style={{
+                      width: "clamp(32px, 8vw, 44px)",
+                      height: "clamp(32px, 8vw, 44px)",
+                      objectFit: "contain",
+                      borderRadius: "50%",
+                      background: "white",
+                      padding: "3px",
+                    }}
+                  />
+                  <div>
+                    <div style={{
+                      color: selectedOrg === org.id ? "#667eea" : "#f3f4f6",
+                      fontSize: "0.8rem",
+                      fontWeight: "700",
+                    }}>
+                      {org.name}
+                    </div>
+              <div style={{
+                      color: selectedOrg === org.id ? "#667eea" : "#f3f4f6",
+                      fontSize: "clamp(0.65rem, 2vw, 0.8rem)",
+                      fontWeight: "700",
+                    }}>
+                      {org.name}
+                    </div>
+                    <div style={{
+                      color: "#9ca3af",
+                      fontSize: "clamp(0.6rem, 1.5vw, 0.7rem)",
+                    }}>
+                      {org.location}
+                    </div>      <div style={{
+                      color: "#9ca3af",
+                      fontSize: "0.7rem",
+                    }}>
+                      {org.location}
+                    </div>
+                  </div>
+                  {selectedOrg === org.id && (
+                    <div style={{
+                      width: "20px",
+                      height: "20px",
+                      background: "#667eea",
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "0.7rem",
+                      color: "white",
+                      fontWeight: "700",
+                    }}>✓</div>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Selected Organization Banner */}
+            {selectedOrg && (
+              <div style={{
+                marginTop: "16px",
+                padding: "12px 16px",
+                background: "linear-gradient(135deg, #1e3a5f 0%, #1e1b4b 100%)",
+                border: "1px solid #667eea",
+                borderRadius: "10px",
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+              }}>
+                <div style={{
+                  width: "32px",
+                  height: "32px",
+                  background: "#667eea",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                  fontSize: "1rem",
+                }}>
+                  ✓
+                </div>
+                <div style={{ textAlign: "left" }}>
+                  <div style={{
+                    color: "#9ca3af",
+                    fontSize: "0.7rem",
+                    fontWeight: "600",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.5px",
+                    marginBottom: "2px",
+                  }}>
+                    Booking as
+                  </div>
+                  <div style={{
+                    color: "#f3f4f6",
+                    fontSize: "0.95rem",
+                    fontWeight: "700",
+                  }}>
+                    {selectedOrg === "ahhc" && "AHHC - Akurana Helping Hands Crawley"}
+                    {selectedOrg === "auf" && "AUF - Akurana United Foundation, London"}
+                    {selectedOrg === "awauk" && "AWA-UK - Akurana Welfare Association, Leicester"}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Event Details Box */}
@@ -888,8 +1021,8 @@ export default function Home() {
                 <div
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
-                    gap: "12px",
+                    gridTemplateColumns: "repeat(3, 1fr)",
+                    gap: "8px",
                   }}
                 >
                   {/* Under 5 */}
@@ -1296,7 +1429,7 @@ export default function Home() {
                         letterSpacing: "0.5px",
                       }}
                     >
-                      RSVP Confirmed!
+                      Booking Confirmed!
                     </h2>
 
                     <p
@@ -1571,7 +1704,7 @@ export default function Home() {
                     <button
                       onClick={() => {
                         const message = encodeURIComponent(
-                          `🎫 New RSVP Booking\n\n` +
+                          `🎫 New Booking\n\n` +
                             `Name: ${submittedData.name}\n` +
                             `Guests: ${submittedData.totalGuests} people\n` +
                             `Amount: £${submittedData.totalAmount}\n\n` +
