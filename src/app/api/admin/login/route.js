@@ -17,10 +17,13 @@ export async function POST(request) {
     // TEMPORARY: Hardcoded hash for testing
     // This is the hash for: ISLAH2026@admin
     const adminPasswordHash =
-      "$2a$10$IjNmWtXEZQ9z05obKFS6sebki/suwT4TccfLWIqtUI1FzBsU798Zu";
+      "$2a$10$aEngRh.DoqLF0CCN6F04UuiyejEyMo8bh9chbraT9SLM4k0Pj4GTq";
 
     // Compare password with hash
+    console.log("HASH IN USE:", adminPasswordHash);
+    console.log("PASSWORD:", password);
     const isValid = await bcrypt.compare(password, adminPasswordHash);
+    console.log("IS VALID:", isValid);
 
     if (!isValid) {
       return NextResponse.json({ error: "Invalid password" }, { status: 401 });
