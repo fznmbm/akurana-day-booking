@@ -590,14 +590,16 @@ ${config.organization.name} Team`;
                     fontWeight: "600",
                   }}
                 >
-                  {new Date(currentDeadline).toLocaleString("en-GB", {
-                    weekday: "long",
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                  {(() => {
+                    const date = new Date(currentDeadline);
+                    const weekday = date.toLocaleDateString("en-GB", { weekday: "long", timeZone: "UTC" });
+                    const day = date.getUTCDate();
+                    const month = date.toLocaleDateString("en-GB", { month: "long", timeZone: "UTC" });
+                    const year = date.getUTCFullYear();
+                    const hours = String(date.getUTCHours()).padStart(2, "0");
+                    const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+                    return `${weekday}, ${day} ${month} ${year} at ${hours}:${minutes}`;
+                  })()}
                 </p>
               ) : (
                 <p
