@@ -346,13 +346,6 @@ export default function Home() {
                   <div>
                     <div style={{
                       color: selectedOrg === org.id ? "#667eea" : "#f3f4f6",
-                      fontSize: "0.8rem",
-                      fontWeight: "700",
-                    }}>
-                      {org.name}
-                    </div>
-              <div style={{
-                      color: selectedOrg === org.id ? "#667eea" : "#f3f4f6",
                       fontSize: "clamp(0.65rem, 2vw, 0.8rem)",
                       fontWeight: "700",
                     }}>
@@ -361,11 +354,6 @@ export default function Home() {
                     <div style={{
                       color: "#9ca3af",
                       fontSize: "clamp(0.6rem, 1.5vw, 0.7rem)",
-                    }}>
-                      {org.location}
-                    </div>      <div style={{
-                      color: "#9ca3af",
-                      fontSize: "0.7rem",
                     }}>
                       {org.location}
                     </div>
