@@ -171,9 +171,9 @@ export default function AdminMealsPage() {
       const data = await response.json();
       if (response.ok && data.mealDeadline) {
         setCurrentDeadline(data.mealDeadline);
-        // Format for datetime-local input
+        // Use UTC time for datetime-local input to avoid timezone issues
         const date = new Date(data.mealDeadline);
-        const formatted = date.toISOString().slice(0, 16);
+        const formatted = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}-${String(date.getUTCDate()).padStart(2, "0")}T${String(date.getUTCHours()).padStart(2, "0")}:${String(date.getUTCMinutes()).padStart(2, "0")}`;
         setNewDeadline(formatted);
       }
     } catch (error) {
@@ -207,11 +207,7 @@ export default function AdminMealsPage() {
         setStats(data.stats);
         setMealTotals(data.mealTotals);
         setRsvps(data.rsvps);
-
-        // Set current deadline from first RSVP
-        if (data.rsvps.length > 0 && data.rsvps[0].mealSelectionDeadline) {
-          setCurrentDeadline(data.rsvps[0].mealSelectionDeadline);
-        }
+        // Don't set deadline from RSVPs - fetchMealDeadline handles this
       }
     } catch (error) {
       console.error("Fetch error:", error);
@@ -237,7 +233,16 @@ Your booking:
 - ${rsvp.age5to12} x Age 5-12
 - ${rsvp.age12plus} x Age 12+
 
-⏰ Deadline: ${new Date(viewingMeal?.mealSelectionDeadline || currentDeadline).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })} at 6:00PM
+⏰ Deadline: ${(() => {
+  const date = new Date(currentDeadline);
+  const day = date.getUTCDate();
+  const month = date.toLocaleDateString("en-GB", { month: "long", timeZone: "UTC" });
+  const year = date.getUTCFullYear();
+  const hours = String(date.getUTCHours()).padStart(2, "0");
+  const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+  const weekday = date.toLocaleDateString("en-GB", { weekday: "long", timeZone: "UTC" });
+  return `${weekday}, ${day} ${month} ${year} at ${hours}:${minutes}`;
+})()}
 
 JazakAllah Khair,
 ${config.organization.name} Team`;
