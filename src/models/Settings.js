@@ -13,6 +13,10 @@ const settingsSchema = new mongoose.Schema({
     type: Date,
     default: () => new Date("2026-01-17T13:00:00.000Z"),
   },
+  mealDeadline: { 
+      type: Date, 
+      default: () => new Date("2026-09-12T22:00:00.000Z") 
+    },
   updatedAt: {
     type: Date,
     default: Date.now,

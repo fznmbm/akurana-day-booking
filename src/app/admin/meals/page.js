@@ -104,6 +104,7 @@ export default function AdminMealsPage() {
 
     fetchMealData();
     fetchTokenStats();
+    fetchMealDeadline(); // ← ADD THIS
   }, []);
 
   // Auto-refresh every 10 seconds
@@ -158,6 +159,25 @@ export default function AdminMealsPage() {
       setMessage({ type: "error", text: "Failed to generate tokens" });
     } finally {
       setGeneratingTokens(false);
+    }
+  };
+
+  const fetchMealDeadline = async () => {
+    try {
+      const token = localStorage.getItem("adminToken");
+      const response = await fetch("/api/admin/update-meal-deadline", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (response.ok && data.mealDeadline) {
+        setCurrentDeadline(data.mealDeadline);
+        // Format for datetime-local input
+        const date = new Date(data.mealDeadline);
+        const formatted = date.toISOString().slice(0, 16);
+        setNewDeadline(formatted);
+      }
+    } catch (error) {
+      console.error("Failed to fetch meal deadline:", error);
     }
   };
 

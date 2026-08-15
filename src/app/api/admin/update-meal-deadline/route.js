@@ -1,6 +1,8 @@
 export const dynamic = "force-dynamic";
+import { NextResponse } from "next/server";
 import dbConnect from "../../../../lib/mongodb";
 import Rsvp from "../../../../models/Rsvp";
+import Settings from "../../../../models/Settings";
 
 function checkAuth(request) {
   const authHeader = request.headers.get("authorization");
@@ -14,7 +16,7 @@ function checkAuth(request) {
 export async function POST(request) {
   try {
     if (!checkAuth(request)) {
-      return Response.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     await dbConnect();
@@ -22,19 +24,36 @@ export async function POST(request) {
     const { deadline, organization } = await request.json();
 
     if (!deadline) {
-      return Response.json({ error: "Deadline is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Deadline is required" },
+        { status: 400 }
+      );
     }
 
     const newDeadline = new Date(deadline + ':00.000Z');
 
     if (isNaN(newDeadline.getTime())) {
-      return Response.json(
+      return NextResponse.json(
         { error: "Invalid deadline format" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
-    // Build filter - if organization specified, only update that org
+    // STEP 1: Save deadline to Settings so it persists even before bookings
+    let settings = await Settings.findOne();
+    if (!settings) {
+      settings = await Settings.create({
+        rsvpDeadline: new Date("2026-09-15T22:00:00.000Z"),
+        mealDeadline: newDeadline,
+        rsvpEnabled: true,
+      });
+    } else {
+      settings.mealDeadline = newDeadline;
+      settings.updatedAt = new Date();
+      await settings.save();
+    }
+
+    // STEP 2: Also update any existing RSVPs that already have meal tokens
     const filter = { mealSelectionToken: { $exists: true } };
     if (organization && organization !== "all") {
       filter.organization = organization;
@@ -42,19 +61,44 @@ export async function POST(request) {
 
     const result = await Rsvp.updateMany(
       filter,
-      { $set: { mealSelectionDeadline: newDeadline } },
+      { $set: { mealSelectionDeadline: newDeadline } }
     );
 
-    return Response.json({
+    return NextResponse.json({
       success: true,
-      message: `Deadline updated successfully`,
-      count: result.modifiedCount,
+      message: `Meal deadline saved successfully`,
+      rsvpsUpdated: result.modifiedCount,
+      deadline: newDeadline,
     });
+
   } catch (error) {
     console.error("Update deadline error:", error);
-    return Response.json(
+    return NextResponse.json(
       { error: "Failed to update deadline" },
-      { status: 500 },
+      { status: 500 }
+    );
+  }
+}
+
+// GET - fetch current meal deadline
+export async function GET(request) {
+  try {
+    if (!checkAuth(request)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    await dbConnect();
+
+    const settings = await Settings.findOne();
+    return NextResponse.json({
+      success: true,
+      mealDeadline: settings?.mealDeadline || new Date("2026-09-12T22:00:00.000Z"),
+    });
+
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to fetch deadline" },
+      { status: 500 }
     );
   }
 }
