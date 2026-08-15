@@ -372,10 +372,11 @@ ${config.organization.name} Team`;
       if (response.ok) {
         setMessage({
           type: "success",
-          text: `Deadline updated for ${data.count} RSVPs`,
+          text: `Meal deadline updated successfully!`,
         });
         setShowDeadlineModal(false);
         fetchMealData();
+        fetchMealDeadline(); // ← ADD THIS to refresh deadline display immediately
         setTimeout(() => setMessage({ type: "", text: "" }), 3000);
       } else {
         setMessage({
