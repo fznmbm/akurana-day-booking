@@ -7,11 +7,10 @@ import { useConfig } from "../contexts/ConfigContext";
 
 export default function Home() {
   // ✅ STEP 1: Declare selectedOrg FIRST
-  const [selectedOrg, setSelectedOrg] = useState("ahhc");
-  
-  // ✅ STEP 2: Declare formData SECOND
+const [selectedOrg, setSelectedOrg] = useState(null);
+
   const [formData, setFormData] = useState({
-    organization: "ahhc",
+    organization: "",
     name: "",
     phone: "",
     email: "",
@@ -265,14 +264,10 @@ export default function Home() {
               display: "flex",
               alignItems: "center",
               gap: "10px",
-              marginBottom: "16px",
+              marginBottom: "8px",
               justifyContent: "center",
             }}>
-              <div style={{
-                height: "1px",
-                flex: 1,
-                background: "#374151",
-              }} />
+              <div style={{ height: "1px", flex: 1, background: "#374151" }} />
               <p style={{
                 color: "#f3f4f6",
                 fontSize: "0.875rem",
@@ -282,14 +277,18 @@ export default function Home() {
                 margin: 0,
                 whiteSpace: "nowrap",
               }}>
-                I am booking from
+                Select Your Organisation
               </p>
-              <div style={{
-                height: "1px",
-                flex: 1,
-                background: "#374151",
-              }} />
+              <div style={{ height: "1px", flex: 1, background: "#374151" }} />
             </div>
+            <p style={{
+              color: "#9ca3af",
+              fontSize: "0.8rem",
+              textAlign: "center",
+              margin: "0 0 16px 0",
+            }}>
+              Please select the organisation you are registered with
+            </p>
             <div style={{
               display: "grid",
               gridTemplateColumns: "repeat(3, 1fr)",
@@ -376,8 +375,49 @@ export default function Home() {
               ))}
             </div>
 
-            {/* Selected Organization Banner */}
-            {selectedOrg && (
+            {/* Organization Banner */}
+            {!selectedOrg ? (
+              <div style={{
+                marginTop: "16px",
+                padding: "12px 16px",
+                background: "#111827",
+                border: "1px dashed #374151",
+                borderRadius: "10px",
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+              }}>
+                <div style={{
+                  width: "32px",
+                  height: "32px",
+                  background: "#374151",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                  fontSize: "1rem",
+                }}>
+                  👆
+                </div>
+                <div style={{ textAlign: "left" }}>
+                  <div style={{
+                    color: "#f59e0b",
+                    fontSize: "0.875rem",
+                    fontWeight: "700",
+                    marginBottom: "2px",
+                  }}>
+                    No Organisation Selected
+                  </div>
+                  <div style={{
+                    color: "#9ca3af",
+                    fontSize: "0.8rem",
+                  }}>
+                    Please select your organisation above to continue
+                  </div>
+                </div>
+              </div>
+            ) : (
               <div style={{
                 marginTop: "16px",
                 padding: "12px 16px",
@@ -778,6 +818,33 @@ export default function Home() {
                 )}
             </div>
           </>
+        ) : !selectedOrg ? (
+          <div style={{
+            background: "#1f2937",
+            borderRadius: "12px",
+            padding: "40px 24px",
+            textAlign: "center",
+            border: "1px dashed #374151",
+            marginBottom: "20px",
+          }}>
+            <div style={{ fontSize: "3rem", marginBottom: "16px" }}>👆</div>
+            <p style={{
+              color: "#f59e0b",
+              fontWeight: "700",
+              fontSize: "1rem",
+              marginBottom: "8px",
+              margin: "0 0 8px 0",
+            }}>
+              Please Select Your Organisation
+            </p>
+            <p style={{
+              color: "#9ca3af",
+              fontSize: "0.875rem",
+              margin: 0,
+            }}>
+              Select the organisation you are registered with above to proceed with your booking
+            </p>
+          </div>
         ) : (
           <>
             {/* Payment Details Box */}
