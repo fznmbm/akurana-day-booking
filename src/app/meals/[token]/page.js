@@ -176,7 +176,7 @@ export default function MealSelectionPage() {
             <div style={{ fontSize: "3rem", marginBottom: "16px" }}>❌</div>
             <h2 style={{ color: "#ef4444", marginBottom: "16px" }}>{error}</h2>
             <p style={{ color: "#9ca3af", marginBottom: "24px" }}>
-              Please contact AHHC if you need assistance.
+              Please contact member of staff if you need assistance.
             </p>
             <a
               href="/"
@@ -351,7 +351,7 @@ export default function MealSelectionPage() {
               }}
             >
               <p style={{ color: "#9ca3af", fontSize: "0.875rem", margin: 0 }}>
-                💡 Need to make changes? Please contact AHHC directly.
+                💡 Need to make changes? Please contact organisation directly.
               </p>
             </div>
 
@@ -514,7 +514,7 @@ export default function MealSelectionPage() {
         {/* Header */}
         <div style={styles.header}>
           <h1 style={styles.title}>🍽️ Meal Selection</h1>
-          <p style={styles.subtitle}>AHHC Family Get-Together 2026</p>
+          <p style={styles.subtitle}>Akurana Day Get-Together 2026</p>
         </div>
 
         {/* Booking Info */}
