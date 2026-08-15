@@ -66,7 +66,7 @@ const RsvpSchema = new mongoose.Schema({
   },
   mealSelectionDeadline: {
     type: Date,
-    default: () => new Date("2026-01-17T22:00:00Z"),
+    default: () => new Date("2026-09-21T22:00:00Z"),
   },
   mealSelections: [
     {
@@ -109,7 +109,8 @@ const RsvpSchema = new mongoose.Schema({
 RsvpSchema.pre("save", function (next) {
   // Generate QR code if payment status is paid and code doesn't exist
   if (this.paymentStatus === "paid" && !this.checkInCode) {
-    this.checkInCode = `AHHC${Date.now()}${Math.random()
+    const orgPrefix = (this.organization || "AKD").toUpperCase();
+    this.checkInCode = `${orgPrefix}${Date.now()}${Math.random()
       .toString(36)
       .substr(2, 5)
       .toUpperCase()}`;

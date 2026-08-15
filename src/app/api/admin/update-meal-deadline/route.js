@@ -19,13 +19,13 @@ export async function POST(request) {
 
     await dbConnect();
 
-    const { deadline } = await request.json();
+    const { deadline, organization } = await request.json();
 
     if (!deadline) {
       return Response.json({ error: "Deadline is required" }, { status: 400 });
     }
 
-    const newDeadline = new Date(deadline);
+    const newDeadline = new Date(deadline + ':00.000Z');
 
     if (isNaN(newDeadline.getTime())) {
       return Response.json(
@@ -34,8 +34,14 @@ export async function POST(request) {
       );
     }
 
+    // Build filter - if organization specified, only update that org
+    const filter = { mealSelectionToken: { $exists: true } };
+    if (organization && organization !== "all") {
+      filter.organization = organization;
+    }
+
     const result = await Rsvp.updateMany(
-      { mealSelectionToken: { $exists: true } },
+      filter,
       { $set: { mealSelectionDeadline: newDeadline } },
     );
 

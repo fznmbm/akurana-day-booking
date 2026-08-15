@@ -86,6 +86,7 @@ export default function AdminMealsPage() {
   const [viewingMeal, setViewingMeal] = useState(null);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [organizationFilter, setOrganizationFilter] = useState("all");
 
   const [showDeadlineModal, setShowDeadlineModal] = useState(false);
   const [newDeadline, setNewDeadline] = useState("");
@@ -305,7 +306,8 @@ ${config.organization.name} Team`;
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `ahhc-catering-report-${
+    const orgLabel = organizationFilter === "all" ? "all-orgs" : organizationFilter;
+    a.download = `akurana-catering-report-${orgLabel}-${
       new Date().toISOString().split("T")[0]
     }.csv`;
     a.click();
@@ -337,7 +339,7 @@ ${config.organization.name} Team`;
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ deadline: newDeadline }),
+        body: JSON.stringify({ deadline: newDeadline, organization: organizationFilter }),
       });
 
       const data = await response.json();
@@ -373,9 +375,11 @@ ${config.organization.name} Team`;
       if (!matchesSearch) return false;
     }
 
+    // Organization filter
+    if (organizationFilter !== "all" && rsvp.organization !== organizationFilter) return false;
+
     // Status filter
-    if (statusFilter === "completed" && !rsvp.mealSelectionComplete)
-      return false;
+    if (statusFilter === "completed" && !rsvp.mealSelectionComplete) return false;
     if (statusFilter === "pending" && rsvp.mealSelectionComplete) return false;
 
     return true;
@@ -423,9 +427,64 @@ ${config.organization.name} Team`;
           >
             🍽️ Meal Management
           </h1>
-          <p style={{ color: "#9ca3af", fontSize: "0.875rem", margin: 0 }}>
+          <p style={{ color: "#9ca3af", fontSize: "0.875rem", margin: "0 0 16px 0" }}>
             {config.event.fullName}
           </p>
+
+          {/* Organization Filter */}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4, 1fr)",
+            gap: "8px",
+            marginBottom: "8px",
+          }}>
+            {[
+              { id: "all", label: "All", logo: null, count: rsvps.length, activeColor: "#ffffff", activeBg: "#667eea", activeBorder: "#667eea" },
+              { id: "ahhc", label: "AHHC", logo: "/logos/ahhc-logo.png", count: rsvps.filter(r => r.organization === "ahhc").length, activeColor: "#667eea", activeBg: "#1e3a5f", activeBorder: "#667eea" },
+              { id: "auf", label: "AUF", logo: "/logos/auf-logo.png", count: rsvps.filter(r => r.organization === "auf").length, activeColor: "#10b981", activeBg: "#064e3b", activeBorder: "#10b981" },
+              { id: "awauk", label: "AWA-UK", logo: "/logos/awauk-logo.png", count: rsvps.filter(r => r.organization === "awauk").length, activeColor: "#f59e0b", activeBg: "#3b1f0f", activeBorder: "#f59e0b" },
+            ].map((org) => (
+              <button
+                key={org.id}
+                onClick={() => setOrganizationFilter(org.id)}
+                style={{
+                  padding: "10px 6px",
+                  background: organizationFilter === org.id ? org.activeBg : "#111827",
+                  border: `2px solid ${organizationFilter === org.id ? org.activeBorder : "#374151"}`,
+                  borderRadius: "8px",
+                  color: organizationFilter === org.id ? org.activeColor : "#9ca3af",
+                  fontWeight: "700",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "4px",
+                  minWidth: 0,
+                }}
+              >
+                {org.logo ? (
+                  <img src={org.logo} alt={org.label} style={{ width: "22px", height: "22px", borderRadius: "50%", objectFit: "contain", background: "white", padding: "2px" }} />
+                ) : (
+                  <span style={{ fontSize: "1rem" }}>🏢</span>
+                )}
+                <span style={{ fontSize: "0.7rem", fontWeight: "700", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", width: "100%", textAlign: "center" }}>
+                  {org.label}
+                </span>
+                <span style={{
+                  background: organizationFilter === org.id ? `${org.activeColor}33` : "#374151",
+                  color: organizationFilter === org.id ? org.activeColor : "#6b7280",
+                  padding: "1px 6px",
+                  borderRadius: "10px",
+                  fontSize: "0.65rem",
+                  fontWeight: "700",
+                }}>
+                  {org.count}
+                </span>
+              </button>
+            ))}
+          </div>
           <div
             style={{
               marginTop: "16px",
