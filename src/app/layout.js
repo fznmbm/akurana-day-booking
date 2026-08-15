@@ -2,11 +2,17 @@ import { config } from "../config";
 import { ConfigProvider } from "../contexts/ConfigContext";
 
 export const metadata = {
-  title: config.event.fullName,
-  description: `RSVP for ${config.organization.fullName} ${config.event.name}`,
-
-  // title: "Islah Trust Eid-Ul-Adha 2026",
-  // description: "RSVP for Islah Trust Eid-Ul-Adha Lunch & Family Gathering 2026",
+  title: "Akurana Day 2026 - All UK Akuranaites Grand Get Together",
+  description: "Book your tickets for Akurana Day 2026 - All UK Akuranaites Grand Get Together. Saturday 26th September 2026, Claremont High School, Harrow. Organised by AHHC, AUF & AWA-UK.",
+  keywords: "Akurana Day 2026, Akurana, AHHC, AUF, AWA-UK, Grand Get Together, Harrow, London",
+  openGraph: {
+    title: "Akurana Day 2026 - All UK Akuranaites Grand Get Together",
+    description: "Book your tickets for Akurana Day 2026. Saturday 26th September 2026, Claremont High School, Harrow.",
+    url: "https://akurana.elitestack.co.uk",
+    siteName: "Akurana Day 2026",
+    locale: "en_GB",
+    type: "website",
+  },
 };
 
 export default function RootLayout({ children }) {
