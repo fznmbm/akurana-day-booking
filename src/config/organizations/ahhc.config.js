@@ -80,7 +80,7 @@ event: {
   // ============================================
   payment: {
     bankName: "HSBC UK",
-    accountName: "AKURANA HELPING HANDS CRAWLEY",
+    accountName: "AKURANA HELPING HANDS CRAWLEY UK",
     sortCode: "40-18-22",
     accountNumber: "92155494",
     reference: "Your Name", // Attendees should use their name as reference
