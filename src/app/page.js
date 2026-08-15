@@ -474,7 +474,7 @@ export default function Home() {
             style={{
               marginTop: "16px",
               fontWeight: "700",
-              color: "#f59e0b",
+              color: "#fbbf24",
               fontSize: "0.9rem",
             }}
           >
