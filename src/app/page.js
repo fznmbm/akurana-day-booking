@@ -231,13 +231,13 @@ export default function Home() {
 
           {/* Event Title */}
           <h1 style={{
-            color: "#667eea",
+            color: "#f59e0b",
             fontSize: "1.6rem",
             marginBottom: "4px",
             fontWeight: "800",
             lineHeight: "1.3",
           }}>
-            Akurana Day 2026
+            AKURANA DAY 2026
           </h1>
           <p style={{
             color: "#f3f4f6",
@@ -245,7 +245,7 @@ export default function Home() {
             fontWeight: "600",
             marginBottom: "4px",
           }}>
-            All UK Akuranaites Grand Get Together
+            ALL UK AKURANAITES GRAND GET TOGETHER
           </p>
           <p style={{
             color: "#9ca3af",
@@ -860,7 +860,7 @@ export default function Home() {
                     style={{
                       marginTop: "8px",
                       fontWeight: index === 0 ? "700" : "500",
-                      color: index === 0 ? "#f59e0b" : "#d1d5db",
+                      color: index === 0 ? "#fbbf24" : "#d1d5db",
                       fontSize: "0.9rem",
                     }}
                   >
@@ -1417,7 +1417,7 @@ export default function Home() {
                         letterSpacing: "0.5px",
                       }}
                     >
-                      Booking Confirmed!
+                      RSVP Confirmed!
                     </h2>
 
                     <p
@@ -1443,6 +1443,37 @@ export default function Home() {
                     >
                       Your registration has been received
                     </p>
+                  </div>
+
+                  {/* Booking Pending Notice */}
+                  <div style={{
+                    background: "#1e3a5f",
+                    border: "1px solid #667eea",
+                    borderRadius: "8px",
+                    padding: "12px 16px",
+                    marginBottom: "12px",
+                    display: "flex",
+                    gap: "10px",
+                    alignItems: "flex-start",
+                  }}>
+                    <span style={{ fontSize: "1.2rem", flexShrink: 0 }}>⏳</span>
+                    <div>
+                      <div style={{
+                        color: "#f3f4f6",
+                        fontSize: "0.875rem",
+                        fontWeight: "700",
+                        marginBottom: "4px",
+                      }}>
+                        Booking Pending Confirmation
+                      </div>
+                      <div style={{
+                        color: "#9ca3af",
+                        fontSize: "0.8rem",
+                        lineHeight: "1.5",
+                      }}>
+                        Your booking will be confirmed once your payment is received. Please complete your bank transfer using the details below.
+                      </div>
+                    </div>
                   </div>
 
                   {/* Booking Details - Compact */}
@@ -1666,14 +1697,17 @@ export default function Home() {
                         }}
                       >
                         ⏰ Deadline:{" "}
-                        {new Date(deadlineInfo.deadline).toLocaleDateString(
-                          "en-GB",
-                          {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          },
-                        )}
+                        {deadlineInfo?.deadline
+                          ? (() => {
+                              const date = new Date(deadlineInfo.deadline);
+                              const day = date.getUTCDate();
+                              const month = date.toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" });
+                              const year = date.getUTCFullYear();
+                              const hours = String(date.getUTCHours()).padStart(2, "0");
+                              const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+                              return `${day} ${month} ${year} at ${hours}:${minutes}`;
+                            })()
+                          : "15 Sept 2026 at 22:00"}
                       </div>
                     </div>
                   )}

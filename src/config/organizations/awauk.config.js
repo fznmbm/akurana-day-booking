@@ -82,7 +82,7 @@ export const awaukConfig = {
   // PAYMENT INFORMATION
   // ============================================
   payment: {
-    bankName: "Barclays Bank",
+    bankName: "Metro Bank",
     accountName: "AKURANA WELFARE ASSOCIATION UK",
     sortCode: "23-05-80",
     accountNumber: "45351769",
