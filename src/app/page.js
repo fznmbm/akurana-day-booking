@@ -13,6 +13,7 @@ const [selectedOrg, setSelectedOrg] = useState(null);
     organization: "",
     name: "",
     phone: "",
+    address: "",
     email: "",
     under5: 0,
     age5to12: 0,
@@ -307,6 +308,7 @@ const [selectedOrg, setSelectedOrg] = useState(null);
                       organization: org.id,
                       name: "",
                       phone: "",
+                      address: "",
                       email: "",
                       under5: 0,
                       age5to12: 0,
@@ -1006,7 +1008,39 @@ const [selectedOrg, setSelectedOrg] = useState(null);
                   }}
                 />
               </div>
-
+          {/* Address */}
+          <div style={{ marginBottom: "20px" }}>
+            <label
+              style={{
+                display: "block",
+                color: "#f3f4f6",
+                marginBottom: "8px",
+                fontSize: "0.875rem",
+                fontWeight: "500",
+              }}
+            >
+              Address *
+            </label>
+            <input
+              type="text"
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              required
+              placeholder="House number, Street, City, Postcode"
+              style={{
+                width: "100%",
+                padding: "12px",
+                background: "#111827",
+                border: "1px solid #374151",
+                borderRadius: "6px",
+                color: "#f3f4f6",
+                fontSize: "0.9rem",
+                outline: "none",
+                boxSizing: "border-box",
+              }}
+            />
+          </div>
               {/* Email */}
               {/* <div style={{ marginBottom: "20px" }}>
                 <label

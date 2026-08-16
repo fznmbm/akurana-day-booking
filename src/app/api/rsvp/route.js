@@ -57,6 +57,7 @@ export async function POST(request) {
       organization: orgId,
       name: body.name,
       phone: body.phone,
+      address: body.address || "",
       email: body.email || "",
       under5: body.under5 || 0,
       age5to12: body.age5to12 || 0,

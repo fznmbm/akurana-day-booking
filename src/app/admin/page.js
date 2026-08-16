@@ -530,8 +530,10 @@ export default function AdminDashboard() {
 
   const exportToCSV = () => {
     const headers = [
+      "Organization",
       "Name",
       "Phone",
+      "Address",
       "Email",
       "Under 5",
       "Age 5-12",
@@ -545,8 +547,10 @@ export default function AdminDashboard() {
       "Date",
     ];
     const rows = rsvps.map((rsvp) => [
+      rsvp.organization || "",
       rsvp.name,
       rsvp.phone,
+      rsvp.address || "",
       rsvp.email || "",
       rsvp.under5,
       rsvp.age5to12,
@@ -2219,6 +2223,17 @@ const copyForWhatsApp = () => {
                             >
                               {rsvp.phone}
                             </div>
+                            {rsvp.address && (
+                              <div
+                                style={{
+                                  fontSize: "0.75rem",
+                                  color: "#6b7280",
+                                  marginTop: "2px",
+                                }}
+                              >
+                                📍 {rsvp.address}
+                              </div>
+                            )}
                             {rsvp.email && (
                               <div
                                 style={{
@@ -2241,7 +2256,7 @@ const copyForWhatsApp = () => {
                                 background: rsvp.organization === "ahhc" ? "#1e3a5f" : rsvp.organization === "auf" ? "#064e3b" : "#3b1f0f",
                                 color: rsvp.organization === "ahhc" ? "#667eea" : rsvp.organization === "auf" ? "#10b981" : "#f59e0b",
                               }}>
-                                {rsvp.organization === "ahhc" ? "🏠 AHHC" : rsvp.organization === "auf" ? "🌍 AUF" : "🌟 AWA-UK"}
+                                {rsvp.organization === "ahhc" ? "AHHC" : rsvp.organization === "auf" ? "AUF" : "AWA-UK"}
                               </div>
                             )}
                           </div>
@@ -2630,6 +2645,25 @@ const copyForWhatsApp = () => {
                       <div style={{ fontSize: "0.875rem", color: "#9ca3af" }}>
                         {rsvp.phone}
                       </div>
+                      {rsvp.address && (
+                        <div style={{ fontSize: "0.75rem", color: "#6b7280", marginTop: "2px" }}>
+                          📍 {rsvp.address}
+                        </div>
+                      )}
+                      {rsvp.organization && (
+                        <div style={{
+                          marginTop: "4px",
+                          display: "inline-block",
+                          padding: "2px 8px",
+                          borderRadius: "4px",
+                          fontSize: "0.7rem",
+                          fontWeight: "700",
+                          background: rsvp.organization === "ahhc" ? "#1e3a5f" : rsvp.organization === "auf" ? "#064e3b" : "#3b1f0f",
+                          color: rsvp.organization === "ahhc" ? "#667eea" : rsvp.organization === "auf" ? "#10b981" : "#f59e0b",
+                        }}>
+                          {rsvp.organization === "ahhc" ? "🏠 AHHC" : rsvp.organization === "auf" ? "🌍 AUF" : "🌟 AWA-UK"}
+                        </div>
+                      )}
                     </div>
                   </div>
 

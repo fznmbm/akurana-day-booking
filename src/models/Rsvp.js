@@ -11,7 +11,12 @@ const RsvpSchema = new mongoose.Schema({
     required: [true, "Please provide your phone number"],
     trim: true,
   },
-
+  address: {
+    type: String,
+    required: false,
+    trim: true,
+    default: "",
+  },
   organization: {
     type: String,
     enum: ["ahhc", "auf", "awauk"],
