@@ -1469,7 +1469,7 @@ ${config.organization.name} Team`;
                             background: rsvp.organization === "ahhc" ? "#1e3a5f" : rsvp.organization === "auf" ? "#064e3b" : "#3b1f0f",
                             color: rsvp.organization === "ahhc" ? "#667eea" : rsvp.organization === "auf" ? "#10b981" : "#f59e0b",
                           }}>
-                            {rsvp.organization === "ahhc" ? "🏠 AHHC" : rsvp.organization === "auf" ? "🌍 AUF" : "🌟 AWA-UK"}
+                            {rsvp.organization === "ahhc" ? "AHHC" : rsvp.organization === "auf" ? "AUF" : "AWA-UK"}
                           </div>
                         )}
                       </td>
@@ -1643,7 +1643,7 @@ ${config.organization.name} Team`;
                     background: rsvp.organization === "ahhc" ? "#1e3a5f" : rsvp.organization === "auf" ? "#064e3b" : "#3b1f0f",
                     color: rsvp.organization === "ahhc" ? "#667eea" : rsvp.organization === "auf" ? "#10b981" : "#f59e0b",
                   }}>
-                    {rsvp.organization === "ahhc" ? "🏠 AHHC" : rsvp.organization === "auf" ? "🌍 AUF" : "🌟 AWA-UK"}
+                    {rsvp.organization === "ahhc" ? "AHHC" : rsvp.organization === "auf" ? "AUF" : "AWA-UK"}
                   </div>
                 )}
 
