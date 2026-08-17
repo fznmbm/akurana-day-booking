@@ -1,4 +1,3 @@
-//src\app\admin\page.js
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -575,67 +574,6 @@ export default function AdminDashboard() {
     window.URL.revokeObjectURL(url);
   };
 
-  // const copyForWhatsApp = () => {
-  //   // Filter only paid RSVPs
-  //   const paidRsvps = rsvps.filter((r) => r.paymentStatus === "paid");
-
-  //   // Format the list
-  //   let message = `🎉 AHHC Family Get-Together 2026\n✅ Confirmed Attendees (Paid)\n\n`;
-
-  //   paidRsvps.forEach((rsvp, index) => {
-  //     const total = rsvp.under5 + rsvp.age5to12 + rsvp.age12plus;
-  //     message += `${index + 1}. ${rsvp.name} - ${total} ${
-  //       total === 1 ? "person" : "people"
-  //     }\n`;
-  //     message += `   • Under 5: ${rsvp.under5} | Age 5-12: ${rsvp.age5to12} | Age 12+: ${rsvp.age12plus}\n\n`;
-  //   });
-
-  //   // Add summary
-  //   const totalPeople = paidRsvps.reduce(
-  //     (sum, r) => sum + r.under5 + r.age5to12 + r.age12plus,
-  //     0
-  //   );
-  //   const totalRevenue = paidRsvps.reduce((sum, r) => sum + r.totalAmount, 0);
-
-  //   message += `━━━━━━━━━━━━━━━━\n`;
-  //   message += `📊 Total: ${paidRsvps.length} families, ${totalPeople} people\n`;
-  //   //message += `💷 Total Revenue: £${totalRevenue}`;
-
-  //   // Copy to clipboard
-  //   navigator.clipboard
-  //     .writeText(message)
-  //     .then(() => {
-  //       setMessage({
-  //         type: "success",
-  //         text: "Copied! Opening WhatsApp... 📋",
-  //       });
-  //       setTimeout(() => setMessage({ type: "", text: "" }), 3000);
-
-  //       // Open WhatsApp
-  //       // Try to open WhatsApp app on mobile, Web WhatsApp on desktop
-  //       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-  //       if (isMobile) {
-  //         // Try to open WhatsApp app with pre-filled text
-  //         window.open(
-  //           `whatsapp://send?text=${encodeURIComponent(message)}`,
-  //           "_blank"
-  //         );
-  //       } else {
-  //         // Open WhatsApp Web
-  //         window.open("https://web.whatsapp.com/", "_blank");
-  //       }
-  //     })
-  //     .catch(() => {
-  //       setMessage({
-  //         type: "error",
-  //         text: "Failed to copy. Please try again.",
-  //       });
-  //     });
-  // };
-
-  //add new version of copyForWhatsApp with better formatting and pending RSVPs included
-
 const copyForWhatsApp = () => {
     // Filter RSVPs by organization if filter is active
     const orgFiltered = organizationFilter === "all" 
@@ -650,35 +588,19 @@ const copyForWhatsApp = () => {
       .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
     const pendingRsvps = orgFiltered.filter((r) => r.paymentStatus === "pending");
-    // const pendingPeople = pendingRsvps.reduce(
-    //   (sum, r) => sum + r.under5 + r.age5to12 + r.age12plus,
-    //   0
-    // );
 
-    // Header
-    //let message = `🎉 *AHHC Get-Together 2026*\n`;
-    // message += `📅 17th January 2026 | 1:00 PM - 8:00 PM\n`;
-    //message += `📍 St Wilfred School, Crawley\n\n`;
-    //message += `━━━━━━━━━━━━━━━━━━━━\n`;
     let message = `✅ *CONFIRMED ATTENDEES (PAID)*\n`;
     message += `📍 ${orgLabel}\n`;
     message += `━━━━━━━━━━━━━━━━\n\n`;
 
-    // List each attendee
     paidRsvps.forEach((rsvp, index) => {
       const total = rsvp.under5 + rsvp.age5to12 + rsvp.age12plus;
       const date = new Date(rsvp.createdAt).toLocaleDateString("en-GB");
 
       message += `*${index + 1}. ${rsvp.name}*\n`;
-      //message += `📞 ${rsvp.phone}\n`;
-      //if (rsvp.email) message += `📧 ${rsvp.email}\n`;
       message += `👥 U5: ${rsvp.under5} | 5-12: ${rsvp.age5to12} | 12+: ${rsvp.age12plus} *(${total} people)*\n\n`;
-      //message += `💷 £${rsvp.totalAmount}`;
-      //if (rsvp.paymentReference) message += ` | Ref: ${rsvp.paymentReference}`;
-      //message += `\n📅 ${date}\n\n`;
     });
 
-    // Summary
     const totalPeople = paidRsvps.reduce(
       (sum, r) => sum + r.under5 + r.age5to12 + r.age12plus,
       0,
@@ -693,17 +615,14 @@ const copyForWhatsApp = () => {
       0,
     );
 
-    //message += `━━━━━━━━━━━━━━━━━━━━\n`;
     message += `━━━━━━━━━━━━━━━━\n`;
     message += `📊 *SUMMARY*\n`;
-    //message += `━━━━━━━━━━━━━━━━━━━━\n`;
     message += `━━━━━━━━━━━━━━━━\n`;
     message += `👨‍👩‍👧‍👦 Total Families: ${paidRsvps.length}\n`;
     message += `👥 Total People: ${totalPeople}\n`;
     message += `   • Under 5: ${totalUnder5}\n`;
     message += `   • Age 5-12: ${totalAge5to12}\n`;
     message += `   • Age 12+: ${totalAge12plus}\n`;
-    // message += `💷 Total Revenue: £${totalRevenue}\n`;
 
     if (pendingRsvps.length > 0) {
       message += `━━━━━━━━━━━━━━━━\n`;
@@ -712,9 +631,7 @@ const copyForWhatsApp = () => {
       message += `👨‍👩‍👧‍👦 Families: ${pendingRsvps.length}\n`;
       message += `👥 People: ${pendingPeople}\n`;
     }
-    // message += `_Generated: ${new Date().toLocaleString("en-GB")}_`;
 
-    // Copy to clipboard and open WhatsApp
     navigator.clipboard
       .writeText(message)
       .then(() => {
@@ -1056,6 +973,110 @@ const copyForWhatsApp = () => {
             {message.text}
           </div>
         )}
+
+        {/* Organization Filter - TOP LEVEL, drives everything below */}
+        <div
+          style={{
+            background: "#1f2937",
+            borderRadius: "12px",
+            padding: "16px",
+            marginBottom: "20px",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
+            border: "1px solid #374151",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "0.75rem",
+              color: "#9ca3af",
+              marginBottom: "10px",
+              fontWeight: "600",
+              textTransform: "uppercase",
+              letterSpacing: "0.5px",
+            }}
+          >
+            🏢 Viewing Organization
+          </div>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(4, 1fr)",
+              gap: "6px",
+              width: "100%",
+            }}
+          >
+            {[
+              { id: "all", label: "All", logo: null, count: rsvps.length, activeColor: "#ffffff", activeBg: "#667eea", activeBorder: "#667eea" },
+              { id: "ahhc", label: "AHHC", logo: "/logos/ahhc-logo.png", count: rsvps.filter(r => r.organization === "ahhc").length, activeColor: "#667eea", activeBg: "#1e3a5f", activeBorder: "#667eea" },
+              { id: "auf", label: "AUF", logo: "/logos/auf-logo.png", count: rsvps.filter(r => r.organization === "auf").length, activeColor: "#10b981", activeBg: "#064e3b", activeBorder: "#10b981" },
+              { id: "awauk", label: "AWA-UK", logo: "/logos/awauk-logo.png", count: rsvps.filter(r => r.organization === "awauk").length, activeColor: "#f59e0b", activeBg: "#3b1f0f", activeBorder: "#f59e0b" },
+            ].map((org) => (
+              <button
+                key={org.id}
+                onClick={() => {
+                  setOrganizationFilter(org.id);
+                  setCurrentPage(1);
+                }}
+                style={{
+                  padding: "10px 6px",
+                  background: organizationFilter === org.id ? org.activeBg : "#111827",
+                  border: `2px solid ${organizationFilter === org.id ? org.activeBorder : "#374151"}`,
+                  borderRadius: "8px",
+                  color: organizationFilter === org.id ? org.activeColor : "#9ca3af",
+                  fontWeight: "700",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "4px",
+                  minWidth: 0,
+                }}
+              >
+                {org.logo ? (
+                  <img
+                    src={org.logo}
+                    alt={org.label}
+                    style={{
+                      width: "22px",
+                      height: "22px",
+                      borderRadius: "50%",
+                      objectFit: "contain",
+                      background: "white",
+                      padding: "2px",
+                      flexShrink: 0,
+                    }}
+                  />
+                ) : (
+                  <span style={{ fontSize: "1rem" }}>🏢</span>
+                )}
+                <span style={{
+                  fontSize: "0.7rem",
+                  fontWeight: "700",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                  width: "100%",
+                  textAlign: "center",
+                }}>
+                  {org.label}
+                </span>
+                <span style={{
+                  background: organizationFilter === org.id ? `${org.activeColor}33` : "#374151",
+                  color: organizationFilter === org.id ? org.activeColor : "#6b7280",
+                  padding: "1px 6px",
+                  borderRadius: "10px",
+                  fontSize: "0.65rem",
+                  fontWeight: "700",
+                }}>
+                  {org.count}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Stats Cards - Responsive Grid */}
         {stats && (
           <div
@@ -1068,9 +1089,11 @@ const copyForWhatsApp = () => {
             }}
           >
             {(() => {
-              // Calculate stats from FILTERED data
-              //const displayRsvps = debouncedSearch ? filteredRsvps : rsvps;
-              const displayRsvps = rsvps;
+              // Calculate stats from data filtered by the selected organization
+              const displayRsvps =
+                organizationFilter === "all"
+                  ? rsvps
+                  : rsvps.filter((r) => r.organization === organizationFilter);
 
               const calculatedStats = {
                 totalRsvps: displayRsvps.length,
@@ -1355,62 +1378,87 @@ const copyForWhatsApp = () => {
                 />
               </h3>
 
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "baseline",
-                  gap: "12px",
-                  marginBottom: "12px",
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: "2.5rem",
-                    fontWeight: "700",
-                    color: "#10b981",
-                    lineHeight: "1",
-                  }}
-                >
-                  {checkInStats.checkedIn}
-                </div>
-                <div
-                  style={{
-                    fontSize: "1.25rem",
-                    color: "#6b7280",
-                  }}
-                >
-                  / {checkInStats.total}
-                </div>
-                <div
-                  style={{
-                    fontSize: "2rem",
-                    fontWeight: "700",
-                    color: "#667eea",
-                    marginLeft: "auto",
-                  }}
-                >
-                  {checkInStats.percentage}%
-                </div>
-              </div>
+              {(() => {
+                // Recompute check-in progress for the selected organization
+                const orgRsvpsForCheckin =
+                  organizationFilter === "all"
+                    ? rsvps
+                    : rsvps.filter((r) => r.organization === organizationFilter);
+                const paidForCheckin = orgRsvpsForCheckin.filter(
+                  (r) => r.paymentStatus === "paid",
+                );
+                const checkedInForCheckin = paidForCheckin.filter(
+                  (r) => r.checkedIn,
+                );
+                const percentageForCheckin =
+                  paidForCheckin.length > 0
+                    ? Math.round(
+                        (checkedInForCheckin.length / paidForCheckin.length) *
+                          100,
+                      )
+                    : 0;
 
-              <div
-                style={{
-                  width: "100%",
-                  height: "8px",
-                  background: "#374151",
-                  borderRadius: "4px",
-                  overflow: "hidden",
-                }}
-              >
-                <div
-                  style={{
-                    width: `${checkInStats.percentage}%`,
-                    height: "100%",
-                    background: "linear-gradient(90deg, #10b981, #667eea)",
-                    transition: "width 0.5s",
-                  }}
-                />
-              </div>
+                return (
+                  <>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "baseline",
+                        gap: "12px",
+                        marginBottom: "12px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: "2.5rem",
+                          fontWeight: "700",
+                          color: "#10b981",
+                          lineHeight: "1",
+                        }}
+                      >
+                        {checkedInForCheckin.length}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: "1.25rem",
+                          color: "#6b7280",
+                        }}
+                      >
+                        / {paidForCheckin.length}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: "2rem",
+                          fontWeight: "700",
+                          color: "#667eea",
+                          marginLeft: "auto",
+                        }}
+                      >
+                        {percentageForCheckin}%
+                      </div>
+                    </div>
+
+                    <div
+                      style={{
+                        width: "100%",
+                        height: "8px",
+                        background: "#374151",
+                        borderRadius: "4px",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: `${percentageForCheckin}%`,
+                          height: "100%",
+                          background: "linear-gradient(90deg, #10b981, #667eea)",
+                          transition: "width 0.5s",
+                        }}
+                      />
+                    </div>
+                  </>
+                );
+              })()}
             </div>
 
             <div
@@ -1771,183 +1819,97 @@ const copyForWhatsApp = () => {
             )}
           </div>
 
-{/* FILTER ROWS - 2 row responsive layout */}
+{/* FILTER ROW - Status + Sort + Controls - Full Width */}
           <div style={{
             display: "flex",
-            flexDirection: "column",
-            gap: "8px",
+            gap: "6px",
+            alignItems: "center",
             width: "100%",
           }}>
-            {/* ROW A: Org Buttons - 4 equal columns always */}
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(4, 1fr)",
-              gap: "6px",
-              width: "100%",
-            }}>
-              {[
-                { id: "all", label: "All", logo: null, count: rsvps.length, activeColor: "#ffffff", activeBg: "#667eea", activeBorder: "#667eea" },
-                { id: "ahhc", label: "AHHC", logo: "/logos/ahhc-logo.png", count: rsvps.filter(r => r.organization === "ahhc").length, activeColor: "#667eea", activeBg: "#1e3a5f", activeBorder: "#667eea" },
-                { id: "auf", label: "AUF", logo: "/logos/auf-logo.png", count: rsvps.filter(r => r.organization === "auf").length, activeColor: "#10b981", activeBg: "#064e3b", activeBorder: "#10b981" },
-                { id: "awauk", label: "AWA-UK", logo: "/logos/awauk-logo.png", count: rsvps.filter(r => r.organization === "awauk").length, activeColor: "#f59e0b", activeBg: "#3b1f0f", activeBorder: "#f59e0b" },
-              ].map((org) => (
-                <button
-                  key={org.id}
-                  onClick={() => {
-                    setOrganizationFilter(org.id);
-                    setCurrentPage(1);
-                  }}
-                  style={{
-                    padding: "10px 6px",
-                    background: organizationFilter === org.id ? org.activeBg : "#111827",
-                    border: `2px solid ${organizationFilter === org.id ? org.activeBorder : "#374151"}`,
-                    borderRadius: "8px",
-                    color: organizationFilter === org.id ? org.activeColor : "#9ca3af",
-                    fontWeight: "700",
-                    cursor: "pointer",
-                    transition: "all 0.2s",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "4px",
-                    minWidth: 0,
-                  }}
-                >
-                  {org.logo ? (
-                    <img
-                      src={org.logo}
-                      alt={org.label}
-                      style={{
-                        width: "22px",
-                        height: "22px",
-                        borderRadius: "50%",
-                        objectFit: "contain",
-                        background: "white",
-                        padding: "2px",
-                        flexShrink: 0,
-                      }}
-                    />
-                  ) : (
-                    <span style={{ fontSize: "1rem" }}>🏢</span>
-                  )}
-                  <span style={{
-                    fontSize: "0.7rem",
-                    fontWeight: "700",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                    width: "100%",
-                    textAlign: "center",
-                  }}>
-                    {org.label}
-                  </span>
-                  <span style={{
-                    background: organizationFilter === org.id ? `${org.activeColor}33` : "#374151",
-                    color: organizationFilter === org.id ? org.activeColor : "#6b7280",
-                    padding: "1px 6px",
-                    borderRadius: "10px",
-                    fontSize: "0.65rem",
-                    fontWeight: "700",
-                  }}>
-                    {org.count}
-                  </span>
-                </button>
-              ))}
-            </div>
+            <select
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              style={{
+                flex: "1",
+                padding: "8px 6px",
+                border: "1px solid #374151",
+                borderRadius: "8px",
+                fontSize: "0.8rem",
+                background: "#111827",
+                cursor: "pointer",
+                outline: "none",
+                color: "#f3f4f6",
+                minWidth: 0,
+              }}
+            >
+              <option value="all">All Status</option>
+              <option value="pending">⏳ Pending</option>
+              <option value="paid">✅ Paid</option>
+              <option value="not-checked">⏸️ Not Checked</option>
+            </select>
 
-            {/* ROW B: Status + Sort + Controls - Full Width */}
-            <div style={{
-              display: "flex",
-              gap: "6px",
-              alignItems: "center",
-              width: "100%",
-            }}>
-              <select
-                value={statusFilter}
-                onChange={(e) => {
-                  setStatusFilter(e.target.value);
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              style={{
+                flex: "1",
+                padding: "8px 6px",
+                border: "1px solid #374151",
+                borderRadius: "8px",
+                fontSize: "0.8rem",
+                background: "#111827",
+                cursor: "pointer",
+                outline: "none",
+                color: "#f3f4f6",
+                minWidth: 0,
+              }}
+            >
+              <option value="date">By Date</option>
+              <option value="name">By Name</option>
+              <option value="amount">By Amount</option>
+            </select>
+
+            <button
+              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+              style={{
+                padding: "8px 12px",
+                border: "1px solid #374151",
+                borderRadius: "8px",
+                fontSize: "0.875rem",
+                background: "#111827",
+                cursor: "pointer",
+                fontWeight: "600",
+                color: "#f3f4f6",
+                flexShrink: 0,
+              }}
+            >
+              {sortOrder === "asc" ? "↑" : "↓"}
+            </button>
+
+            {search && (
+              <button
+                onClick={() => {
+                  setSearch("");
                   setCurrentPage(1);
                 }}
                 style={{
-                  flex: "1",
-                  padding: "8px 6px",
-                  border: "1px solid #374151",
-                  borderRadius: "8px",
-                  fontSize: "0.8rem",
-                  background: "#111827",
-                  cursor: "pointer",
-                  outline: "none",
-                  color: "#f3f4f6",
-                  minWidth: 0,
-                }}
-              >
-                <option value="all">All Status</option>
-                <option value="pending">⏳ Pending</option>
-                <option value="paid">✅ Paid</option>
-                <option value="not-checked">⏸️ Not Checked</option>
-              </select>
-
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                style={{
-                  flex: "1",
-                  padding: "8px 6px",
-                  border: "1px solid #374151",
-                  borderRadius: "8px",
-                  fontSize: "0.8rem",
-                  background: "#111827",
-                  cursor: "pointer",
-                  outline: "none",
-                  color: "#f3f4f6",
-                  minWidth: 0,
-                }}
-              >
-                <option value="date">By Date</option>
-                <option value="name">By Name</option>
-                <option value="amount">By Amount</option>
-              </select>
-
-              <button
-                onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-                style={{
                   padding: "8px 12px",
-                  border: "1px solid #374151",
+                  background: "#374151",
+                  border: "none",
                   borderRadius: "8px",
-                  fontSize: "0.875rem",
-                  background: "#111827",
+                  fontSize: "0.8rem",
                   cursor: "pointer",
                   fontWeight: "600",
                   color: "#f3f4f6",
                   flexShrink: 0,
                 }}
               >
-                {sortOrder === "asc" ? "↑" : "↓"}
+                ✕
               </button>
-
-              {search && (
-                <button
-                  onClick={() => {
-                    setSearch("");
-                    setCurrentPage(1);
-                  }}
-                  style={{
-                    padding: "8px 12px",
-                    background: "#374151",
-                    border: "none",
-                    borderRadius: "8px",
-                    fontSize: "0.8rem",
-                    cursor: "pointer",
-                    fontWeight: "600",
-                    color: "#f3f4f6",
-                    flexShrink: 0,
-                  }}
-                >
-                  ✕
-                </button>
-              )}
-            </div>
+            )}
           </div>
 
           {/* Bulk Actions */}

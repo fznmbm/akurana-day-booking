@@ -1,3 +1,4 @@
+//src\app\admin\page.js
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -105,6 +106,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [organizationFilter, setOrganizationFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedRows, setSelectedRows] = useState([]);
   const [sortBy, setSortBy] = useState("date");
@@ -192,6 +194,8 @@ export default function AdminDashboard() {
       const data = await response.json();
       if (response.ok) {
         setSettings(data.data);
+        // Convert UTC to local time for datetime-local input
+        const utcDate = new Date(data.data.rsvpDeadline);
         setNewDeadline(
           new Date(data.data.rsvpDeadline).toISOString().slice(0, 16),
         );
@@ -526,8 +530,10 @@ export default function AdminDashboard() {
 
   const exportToCSV = () => {
     const headers = [
+      "Organization",
       "Name",
       "Phone",
+      "Address",
       "Email",
       "Under 5",
       "Age 5-12",
@@ -541,8 +547,10 @@ export default function AdminDashboard() {
       "Date",
     ];
     const rows = rsvps.map((rsvp) => [
+      rsvp.organization || "",
       rsvp.name,
       rsvp.phone,
+      rsvp.address || "",
       rsvp.email || "",
       rsvp.under5,
       rsvp.age5to12,
@@ -626,13 +634,22 @@ export default function AdminDashboard() {
   //     });
   // };
 
-  const copyForWhatsApp = () => {
-    // Filter only paid RSVPs
-    const paidRsvps = rsvps
-      .filter((r) => r.paymentStatus === "paid")
-      .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)); // Sort by date
+  //add new version of copyForWhatsApp with better formatting and pending RSVPs included
 
-    const pendingRsvps = rsvps.filter((r) => r.paymentStatus === "pending");
+const copyForWhatsApp = () => {
+    // Filter RSVPs by organization if filter is active
+    const orgFiltered = organizationFilter === "all" 
+      ? rsvps 
+      : rsvps.filter((r) => r.organization === organizationFilter);
+
+    const orgNames = { ahhc: "AHHC - Crawley", auf: "AUF - London", awauk: "AWA-UK - Leicester" };
+    const orgLabel = organizationFilter === "all" ? "All Organizations" : orgNames[organizationFilter];
+
+    const paidRsvps = orgFiltered
+      .filter((r) => r.paymentStatus === "paid")
+      .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+
+    const pendingRsvps = orgFiltered.filter((r) => r.paymentStatus === "pending");
     // const pendingPeople = pendingRsvps.reduce(
     //   (sum, r) => sum + r.under5 + r.age5to12 + r.age12plus,
     //   0
@@ -644,7 +661,7 @@ export default function AdminDashboard() {
     //message += `📍 St Wilfred School, Crawley\n\n`;
     //message += `━━━━━━━━━━━━━━━━━━━━\n`;
     let message = `✅ *CONFIRMED ATTENDEES (PAID)*\n`;
-    //message += `━━━━━━━━━━━━━━━━━━━━\n\n`;
+    message += `📍 ${orgLabel}\n`;
     message += `━━━━━━━━━━━━━━━━\n\n`;
 
     // List each attendee
@@ -671,6 +688,11 @@ export default function AdminDashboard() {
     const totalAge5to12 = paidRsvps.reduce((sum, r) => sum + r.age5to12, 0);
     const totalAge12plus = paidRsvps.reduce((sum, r) => sum + r.age12plus, 0);
 
+    const pendingPeople = pendingRsvps.reduce(
+      (sum, r) => sum + r.under5 + r.age5to12 + r.age12plus,
+      0,
+    );
+
     //message += `━━━━━━━━━━━━━━━━━━━━\n`;
     message += `━━━━━━━━━━━━━━━━\n`;
     message += `📊 *SUMMARY*\n`;
@@ -685,8 +707,10 @@ export default function AdminDashboard() {
 
     if (pendingRsvps.length > 0) {
       message += `━━━━━━━━━━━━━━━━\n`;
-      message += `⏳ Awaiting Payment: ${pendingRsvps.length} families \n`;
+      message += `⏳ Awaiting Payment (Pending):\n`;
       message += `━━━━━━━━━━━━━━━━\n`;
+      message += `👨‍👩‍👧‍👦 Families: ${pendingRsvps.length}\n`;
+      message += `👥 People: ${pendingPeople}\n`;
     }
     // message += `_Generated: ${new Date().toLocaleString("en-GB")}_`;
 
@@ -748,10 +772,10 @@ export default function AdminDashboard() {
         if (!matchesSearch) return false;
       }
 
-      // 2. CHECK-IN MODE FILTER
-      // if (checkInMode) {
-      //   return rsvp.paymentStatus === "paid" && !rsvp.checkedIn;
-      // }
+      // 2. ORGANIZATION FILTER
+      if (organizationFilter !== "all") {
+        if (rsvp.organization !== organizationFilter) return false;
+      }
 
       // 3. STATUS FILTER
       if (statusFilter === "all") return true;
@@ -1503,13 +1527,21 @@ export default function AdminDashboard() {
                 >
                   Current deadline:{" "}
                   <strong style={{ color: "#f3f4f6" }} suppressHydrationWarning>
-                    {new Date(settings.rsvpDeadline).toLocaleString("en-GB", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+                    {(() => {
+                      const date = new Date(settings.rsvpDeadline);
+                      const day = date.getUTCDate();
+                      const month = date.toLocaleDateString("en-GB", {
+                        month: "short",
+                        timeZone: "UTC",
+                      });
+                      const year = date.getUTCFullYear();
+                      const hours = String(date.getUTCHours()).padStart(2, "0");
+                      const minutes = String(date.getUTCMinutes()).padStart(
+                        2,
+                        "0",
+                      );
+                      return `${day} ${month} ${year}, ${hours}:${minutes}`;
+                    })()}
                   </strong>
                   {" • "}
                   <span
@@ -1700,138 +1732,222 @@ export default function AdminDashboard() {
             {mobileFiltersOpen ? "Hide Filters ▲" : "Show Filters ▼"}
           </button>
 
-          <div
-            style={{
-              display: "flex",
-              gap: "12px",
-              flexWrap: "wrap",
-              alignItems: "center",
-            }}
-            className={mobileFiltersOpen ? "mobile-filters-open" : ""}
-          >
-            <div style={{ flex: "1", minWidth: "200px", position: "relative" }}>
-              <input
-                type="text"
-                placeholder="🔍 Search name, phone, email..."
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setCurrentPage(1);
-                }}
-                style={{
-                  width: "100%",
-                  padding: "10px 14px",
-                  paddingRight: isSearching ? "40px" : "14px", // Space for spinner
-                  border: "1px solid #374151",
-                  borderRadius: "8px",
-                  fontSize: "0.875rem",
-                  outline: "none",
-                  background: "#111827",
-                  color: "#f3f4f6",
-                  transition: "padding-right 0.2s",
-                }}
-              />
-
-              {/* Loading Spinner */}
-              {isSearching && (
-                <div
-                  style={{
-                    position: "absolute",
-                    right: "12px",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    width: "16px",
-                    height: "16px",
-                    border: "2px solid #374151",
-                    borderTop: "2px solid #667eea",
-                    borderRadius: "50%",
-                    animation: "spin 0.6s linear infinite",
-                  }}
-                />
-              )}
-            </div>
-
-            <select
-              value={statusFilter}
+          {/* ROW 1: Search Bar - Full Width */}
+          <div style={{ position: "relative", marginBottom: "12px" }}>
+            <input
+              type="text"
+              placeholder="🔍 Search name, phone, email..."
+              value={search}
               onChange={(e) => {
-                setStatusFilter(e.target.value);
+                setSearch(e.target.value);
                 setCurrentPage(1);
               }}
               style={{
+                width: "100%",
                 padding: "10px 14px",
+                paddingRight: isSearching ? "40px" : "14px",
                 border: "1px solid #374151",
                 borderRadius: "8px",
                 fontSize: "0.875rem",
-                background: "#111827",
-                cursor: "pointer",
                 outline: "none",
-                color: "#f3f4f6",
-                minWidth: "120px",
-              }}
-            >
-              <option value="all">All Status</option>
-              <option value="pending">⏳ Pending</option>
-              <option value="paid">✅ Paid</option>
-              <option value="not-checked">⏸️ Not Checked</option>
-            </select>
-
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              style={{
-                padding: "10px 14px",
-                border: "1px solid #374151",
-                borderRadius: "8px",
-                fontSize: "0.875rem",
                 background: "#111827",
-                cursor: "pointer",
-                outline: "none",
                 color: "#f3f4f6",
-                minWidth: "120px",
+                boxSizing: "border-box",
               }}
-            >
-              <option value="date">By Date</option>
-              <option value="name">By Name</option>
-              <option value="amount">By Amount</option>
-            </select>
+            />
+            {isSearching && (
+              <div style={{
+                position: "absolute",
+                right: "12px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                width: "16px",
+                height: "16px",
+                border: "2px solid #374151",
+                borderTop: "2px solid #667eea",
+                borderRadius: "50%",
+                animation: "spin 0.6s linear infinite",
+              }} />
+            )}
+          </div>
 
-            <button
-              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-              style={{
-                padding: "10px 14px",
-                border: "1px solid #374151",
-                borderRadius: "8px",
-                fontSize: "0.875rem",
-                background: "#111827",
-                cursor: "pointer",
-                fontWeight: "600",
-                color: "#f3f4f6",
-                minWidth: "44px",
-              }}
-            >
-              {sortOrder === "asc" ? "↑" : "↓"}
-            </button>
+{/* FILTER ROWS - 2 row responsive layout */}
+          <div style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "8px",
+            width: "100%",
+          }}>
+            {/* ROW A: Org Buttons - 4 equal columns always */}
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(4, 1fr)",
+              gap: "6px",
+              width: "100%",
+            }}>
+              {[
+                { id: "all", label: "All", logo: null, count: rsvps.length, activeColor: "#ffffff", activeBg: "#667eea", activeBorder: "#667eea" },
+                { id: "ahhc", label: "AHHC", logo: "/logos/ahhc-logo.png", count: rsvps.filter(r => r.organization === "ahhc").length, activeColor: "#667eea", activeBg: "#1e3a5f", activeBorder: "#667eea" },
+                { id: "auf", label: "AUF", logo: "/logos/auf-logo.png", count: rsvps.filter(r => r.organization === "auf").length, activeColor: "#10b981", activeBg: "#064e3b", activeBorder: "#10b981" },
+                { id: "awauk", label: "AWA-UK", logo: "/logos/awauk-logo.png", count: rsvps.filter(r => r.organization === "awauk").length, activeColor: "#f59e0b", activeBg: "#3b1f0f", activeBorder: "#f59e0b" },
+              ].map((org) => (
+                <button
+                  key={org.id}
+                  onClick={() => {
+                    setOrganizationFilter(org.id);
+                    setCurrentPage(1);
+                  }}
+                  style={{
+                    padding: "10px 6px",
+                    background: organizationFilter === org.id ? org.activeBg : "#111827",
+                    border: `2px solid ${organizationFilter === org.id ? org.activeBorder : "#374151"}`,
+                    borderRadius: "8px",
+                    color: organizationFilter === org.id ? org.activeColor : "#9ca3af",
+                    fontWeight: "700",
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "4px",
+                    minWidth: 0,
+                  }}
+                >
+                  {org.logo ? (
+                    <img
+                      src={org.logo}
+                      alt={org.label}
+                      style={{
+                        width: "22px",
+                        height: "22px",
+                        borderRadius: "50%",
+                        objectFit: "contain",
+                        background: "white",
+                        padding: "2px",
+                        flexShrink: 0,
+                      }}
+                    />
+                  ) : (
+                    <span style={{ fontSize: "1rem" }}>🏢</span>
+                  )}
+                  <span style={{
+                    fontSize: "0.7rem",
+                    fontWeight: "700",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    width: "100%",
+                    textAlign: "center",
+                  }}>
+                    {org.label}
+                  </span>
+                  <span style={{
+                    background: organizationFilter === org.id ? `${org.activeColor}33` : "#374151",
+                    color: organizationFilter === org.id ? org.activeColor : "#6b7280",
+                    padding: "1px 6px",
+                    borderRadius: "10px",
+                    fontSize: "0.65rem",
+                    fontWeight: "700",
+                  }}>
+                    {org.count}
+                  </span>
+                </button>
+              ))}
+            </div>
 
-            {search && (
-              <button
-                onClick={() => {
-                  setSearch("");
+            {/* ROW B: Status + Sort + Controls - Full Width */}
+            <div style={{
+              display: "flex",
+              gap: "6px",
+              alignItems: "center",
+              width: "100%",
+            }}>
+              <select
+                value={statusFilter}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value);
                   setCurrentPage(1);
                 }}
                 style={{
-                  padding: "10px 14px",
-                  background: "#374151",
-                  border: "none",
+                  flex: "1",
+                  padding: "8px 6px",
+                  border: "1px solid #374151",
+                  borderRadius: "8px",
+                  fontSize: "0.8rem",
+                  background: "#111827",
+                  cursor: "pointer",
+                  outline: "none",
+                  color: "#f3f4f6",
+                  minWidth: 0,
+                }}
+              >
+                <option value="all">All Status</option>
+                <option value="pending">⏳ Pending</option>
+                <option value="paid">✅ Paid</option>
+                <option value="not-checked">⏸️ Not Checked</option>
+              </select>
+
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                style={{
+                  flex: "1",
+                  padding: "8px 6px",
+                  border: "1px solid #374151",
+                  borderRadius: "8px",
+                  fontSize: "0.8rem",
+                  background: "#111827",
+                  cursor: "pointer",
+                  outline: "none",
+                  color: "#f3f4f6",
+                  minWidth: 0,
+                }}
+              >
+                <option value="date">By Date</option>
+                <option value="name">By Name</option>
+                <option value="amount">By Amount</option>
+              </select>
+
+              <button
+                onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+                style={{
+                  padding: "8px 12px",
+                  border: "1px solid #374151",
                   borderRadius: "8px",
                   fontSize: "0.875rem",
+                  background: "#111827",
                   cursor: "pointer",
                   fontWeight: "600",
                   color: "#f3f4f6",
+                  flexShrink: 0,
                 }}
               >
-                Clear
+                {sortOrder === "asc" ? "↑" : "↓"}
               </button>
-            )}
+
+              {search && (
+                <button
+                  onClick={() => {
+                    setSearch("");
+                    setCurrentPage(1);
+                  }}
+                  style={{
+                    padding: "8px 12px",
+                    background: "#374151",
+                    border: "none",
+                    borderRadius: "8px",
+                    fontSize: "0.8rem",
+                    cursor: "pointer",
+                    fontWeight: "600",
+                    color: "#f3f4f6",
+                    flexShrink: 0,
+                  }}
+                >
+                  ✕
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Bulk Actions */}
@@ -1901,10 +2017,10 @@ export default function AdminDashboard() {
             borderRadius: "12px",
             boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
             border: "1px solid #374151",
-            overflow: "visible",
+            overflow: "hidden",
           }}
         >
-          <div style={{ overflowX: "auto", overflowY: "visible" }}>
+          <div style={{ overflowX: "auto" }}>
             <table
               style={{
                 width: "100%",
@@ -2010,7 +2126,7 @@ export default function AdminDashboard() {
                       fontWeight: "600",
                       color: "#9ca3af",
                       textTransform: "uppercase",
-                      width: "80px",
+                      width: "120px",
                     }}
                   >
                     Actions
@@ -2048,22 +2164,11 @@ export default function AdminDashboard() {
                   currentPageData.map((rsvp) => (
                     <tr
                       key={rsvp._id}
+                      className={
+                        selectedRows.includes(rsvp._id) ? "selected" : ""
+                      }
                       style={{
                         borderBottom: "1px solid #374151",
-                        transition: "background-color 0.15s ease",
-                        backgroundColor: selectedRows.includes(rsvp._id)
-                          ? "#1e3a8a"
-                          : "#1f2937",
-                      }}
-                      onMouseEnter={(e) => {
-                        if (!selectedRows.includes(rsvp._id)) {
-                          e.currentTarget.style.backgroundColor = "#2d3748";
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!selectedRows.includes(rsvp._id)) {
-                          e.currentTarget.style.backgroundColor = "#1f2937";
-                        }
                       }}
                     >
                       <td style={{ padding: "16px" }}>
@@ -2118,6 +2223,17 @@ export default function AdminDashboard() {
                             >
                               {rsvp.phone}
                             </div>
+                            {rsvp.address && (
+                              <div
+                                style={{
+                                  fontSize: "0.75rem",
+                                  color: "#6b7280",
+                                  marginTop: "2px",
+                                }}
+                              >
+                                📍 {rsvp.address}
+                              </div>
+                            )}
                             {rsvp.email && (
                               <div
                                 style={{
@@ -2127,6 +2243,20 @@ export default function AdminDashboard() {
                                 }}
                               >
                                 {rsvp.email}
+                              </div>
+                            )}
+                            {rsvp.organization && (
+                              <div style={{
+                                marginTop: "4px",
+                                display: "inline-block",
+                                padding: "2px 8px",
+                                borderRadius: "4px",
+                                fontSize: "0.7rem",
+                                fontWeight: "700",
+                                background: rsvp.organization === "ahhc" ? "#1e3a5f" : rsvp.organization === "auf" ? "#064e3b" : "#3b1f0f",
+                                color: rsvp.organization === "ahhc" ? "#667eea" : rsvp.organization === "auf" ? "#10b981" : "#f59e0b",
+                              }}>
+                                {rsvp.organization === "ahhc" ? "AHHC" : rsvp.organization === "auf" ? "AUF" : "AWA-UK"}
                               </div>
                             )}
                           </div>
@@ -2274,7 +2404,7 @@ export default function AdminDashboard() {
                                             .share({
                                               files: [file],
                                               title: `QR Code for ${rsvp.name}`,
-                                              text: `Check-in QR code for ${rsvp.name} - {config.event.fullName}`,
+                                              text: `Check-in QR code for ${rsvp.name}\n${config.event.fullName}`,
                                             })
                                             .catch((err) =>
                                               console.log("Share cancelled"),
@@ -2282,7 +2412,7 @@ export default function AdminDashboard() {
                                         } else {
                                           // Fallback: Open WhatsApp Web
                                           const message = encodeURIComponent(
-                                            `QR Code for ${rsvp.name} - {config.event.fullName}\nCode: ${rsvp.checkInCode}`,
+                                            `Check-in QR code for ${rsvp.name}\n${config.event.fullName}\nCode:${rsvp.checkInCode}`, // ✅ CORRECT
                                           );
                                           window.open(
                                             `https://wa.me/?text=${message}`,
@@ -2360,88 +2490,38 @@ export default function AdminDashboard() {
                         style={{
                           padding: "16px",
                           textAlign: "center",
-                          position: "relative",
-                          overflow: "visible",
                         }}
                       >
                         <button
-                          onClick={() =>
-                            setActionMenuOpen(
-                              actionMenuOpen === rsvp._id ? null : rsvp._id,
-                            )
-                          }
+                          onClick={() => deleteRsvp(rsvp._id)}
                           style={{
-                            padding: "8px",
+                            width: "36px",
+                            height: "36px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
                             background: "transparent",
-                            border: "none",
+                            color: "#6b7280",
+                            border: "1px solid transparent",
                             borderRadius: "6px",
                             cursor: "pointer",
-                            fontSize: "1.25rem",
-                            color: "#9ca3af",
-                            transition: "all 0.15s",
+                            fontSize: "1.125rem",
+                            transition: "all 0.2s ease",
                           }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = "#7f1d1d";
+                            e.currentTarget.style.borderColor = "#ef4444";
+                            e.currentTarget.style.color = "#ef4444";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = "transparent";
+                            e.currentTarget.style.borderColor = "transparent";
+                            e.currentTarget.style.color = "#6b7280";
+                          }}
+                          title="Delete RSVP"
                         >
-                          ⋮
+                          🗑️
                         </button>
-
-                        {actionMenuOpen === rsvp._id && (
-                          <>
-                            <div
-                              style={{
-                                position: "fixed",
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                bottom: 0,
-                                zIndex: 10,
-                              }}
-                              onClick={() => setActionMenuOpen(null)}
-                            />
-                            <div
-                              style={{
-                                position: "absolute",
-                                right: "16px",
-                                top: "45px",
-                                background: "#1f2937",
-                                borderRadius: "8px",
-                                boxShadow: "0 10px 25px rgba(0,0,0,0.5)",
-                                padding: "8px",
-                                minWidth: "160px",
-                                zIndex: 20,
-                                border: "1px solid #374151",
-                              }}
-                            >
-                              {/* DELETE BUTTON - Professional minimal design */}
-                              <button
-                                onClick={() => deleteRsvp(rsvp._id)}
-                                style={{
-                                  width: "100%",
-                                  padding: "10px 12px",
-                                  background: "transparent",
-                                  border: "none",
-                                  textAlign: "left",
-                                  cursor: "pointer",
-                                  borderRadius: "6px",
-                                  fontSize: "0.875rem",
-                                  fontWeight: "500",
-                                  color: "#ef4444",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: "8px",
-                                }}
-                                onMouseEnter={(e) =>
-                                  (e.currentTarget.style.background = "#7f1d1d")
-                                }
-                                onMouseLeave={(e) =>
-                                  (e.currentTarget.style.background =
-                                    "transparent")
-                                }
-                              >
-                                🗑️ Delete RSVP
-                              </button>
-                            </div>
-                          </>
-                        )}
                       </td>
                     </tr>
                   ))
@@ -2565,6 +2645,25 @@ export default function AdminDashboard() {
                       <div style={{ fontSize: "0.875rem", color: "#9ca3af" }}>
                         {rsvp.phone}
                       </div>
+                      {rsvp.address && (
+                        <div style={{ fontSize: "0.75rem", color: "#6b7280", marginTop: "2px" }}>
+                          📍 {rsvp.address}
+                        </div>
+                      )}
+                      {rsvp.organization && (
+                        <div style={{
+                          marginTop: "4px",
+                          display: "inline-block",
+                          padding: "2px 8px",
+                          borderRadius: "4px",
+                          fontSize: "0.7rem",
+                          fontWeight: "700",
+                          background: rsvp.organization === "ahhc" ? "#1e3a5f" : rsvp.organization === "auf" ? "#064e3b" : "#3b1f0f",
+                          color: rsvp.organization === "ahhc" ? "#667eea" : rsvp.organization === "auf" ? "#10b981" : "#f59e0b",
+                        }}>
+                          {rsvp.organization === "ahhc" ? "AHHC" : rsvp.organization === "auf" ? "AUF" : "AWA-UK"}
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -2885,7 +2984,7 @@ export default function AdminDashboard() {
                                       .share({
                                         files: [file],
                                         title: `QR Code - ${rsvp.name}`,
-                                        text: `Check-in QR code for ${rsvp.name}\n{config.event.fullName}`,
+                                        text: `Check-in QR code for ${rsvp.name}\n${config.event.fullName}`,
                                       })
                                       .catch((err) =>
                                         console.log("Share cancelled"),
@@ -2898,7 +2997,7 @@ export default function AdminDashboard() {
                                         rsvp.under5 +
                                         rsvp.age5to12 +
                                         rsvp.age12plus
-                                      }\n{config.event.fullName}`,
+                                      }\n${config.event.fullName}`,
                                     );
                                     const isMobile =
                                       /iPhone|iPad|iPod|Android/i.test(
@@ -3592,6 +3691,7 @@ export default function AdminDashboard() {
             opacity: 0.5;
           }
         }
+
         @keyframes spin {
           from {
             transform: translateY(-50%) rotate(0deg);
@@ -3601,11 +3701,28 @@ export default function AdminDashboard() {
           }
         }
 
+        /* TABLE ROW HOVER - CRITICAL FIX */
+        :global(tbody tr) {
+          background-color: #1f2937 !important;
+          transition: background-color 0.2s ease !important;
+        }
+
+        :global(tbody tr:hover) {
+          background-color: #374151 !important;
+        }
+
+        :global(tbody tr.selected) {
+          background-color: #1e3a8a !important;
+        }
+
+        :global(tbody tr.selected:hover) {
+          background-color: #1e40af !important;
+        }
+
         @media (max-width: 768px) {
           .stats-grid {
             grid-template-columns: repeat(2, 1fr) !important;
           }
-
           .desktop-table {
             display: none !important;
           }
