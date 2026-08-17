@@ -1458,6 +1458,20 @@ ${config.organization.name} Team`;
                         <div style={{ fontSize: "0.875rem", color: "#9ca3af" }}>
                           {rsvp.phone}
                         </div>
+                        {rsvp.organization && (
+                          <div style={{
+                            marginTop: "4px",
+                            display: "inline-block",
+                            padding: "2px 8px",
+                            borderRadius: "4px",
+                            fontSize: "0.7rem",
+                            fontWeight: "700",
+                            background: rsvp.organization === "ahhc" ? "#1e3a5f" : rsvp.organization === "auf" ? "#064e3b" : "#3b1f0f",
+                            color: rsvp.organization === "ahhc" ? "#667eea" : rsvp.organization === "auf" ? "#10b981" : "#f59e0b",
+                          }}>
+                            {rsvp.organization === "ahhc" ? "🏠 AHHC" : rsvp.organization === "auf" ? "🌍 AUF" : "🌟 AWA-UK"}
+                          </div>
+                        )}
                       </td>
                       <td style={{ padding: "16px", textAlign: "center" }}>
                         <div style={{ fontSize: "0.875rem", color: "#f3f4f6" }}>
@@ -1613,11 +1627,25 @@ ${config.organization.name} Team`;
                   style={{
                     fontSize: "0.875rem",
                     color: "#9ca3af",
-                    marginBottom: "12px",
+                    marginBottom: "6px",
                   }}
                 >
                   {rsvp.phone}
                 </div>
+                {rsvp.organization && (
+                  <div style={{
+                    marginBottom: "12px",
+                    display: "inline-block",
+                    padding: "2px 8px",
+                    borderRadius: "4px",
+                    fontSize: "0.7rem",
+                    fontWeight: "700",
+                    background: rsvp.organization === "ahhc" ? "#1e3a5f" : rsvp.organization === "auf" ? "#064e3b" : "#3b1f0f",
+                    color: rsvp.organization === "ahhc" ? "#667eea" : rsvp.organization === "auf" ? "#10b981" : "#f59e0b",
+                  }}>
+                    {rsvp.organization === "ahhc" ? "🏠 AHHC" : rsvp.organization === "auf" ? "🌍 AUF" : "🌟 AWA-UK"}
+                  </div>
+                )}
 
                 {/* Attendees */}
                 <div style={{ marginBottom: "12px" }}>
