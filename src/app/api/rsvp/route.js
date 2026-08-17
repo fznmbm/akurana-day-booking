@@ -29,6 +29,15 @@ export async function POST(request) {
       );
     }
 
+    // IMPROVEMENT 1: Check for duplicate booking by phone number
+    const existingBooking = await Rsvp.findOne({ phone: body.phone });
+    if (existingBooking) {
+      return NextResponse.json(
+        { error: "A booking already exists with this phone number. Please contact the organiser if you need to make changes." },
+        { status: 409 },
+      );
+    }
+
     // Get correct config based on organization selected by user
     const orgId = body.organization || "ahhc";
     let orgConfig;
@@ -52,6 +61,9 @@ export async function POST(request) {
       (body.age5to12 || 0) * childTier.price +
       (body.age12plus || 0) * adultTier.price;
 
+    // IMPROVEMENT 2: Generate human-readable booking reference
+    const bookingRef = `AKD-${orgId.toUpperCase()}-${Date.now().toString().slice(-6)}`;
+
     // Create new RSVP with organization field
     const rsvp = await Rsvp.create({
       organization: orgId,
@@ -63,7 +75,7 @@ export async function POST(request) {
       age5to12: body.age5to12 || 0,
       age12plus: body.age12plus || 0,
       totalAmount: totalAmount,
-      paymentReference: body.paymentReference || "",
+      paymentReference: bookingRef,
       notes: body.notes || "",
     });
 
@@ -71,6 +83,7 @@ export async function POST(request) {
       {
         success: true,
         message: "RSVP submitted successfully!",
+        bookingRef,
         data: rsvp,
       },
       { status: 201 },

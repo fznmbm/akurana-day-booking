@@ -51,6 +51,12 @@ const RsvpSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+  bookingRef: {
+    type: String,
+    trim: true,
+    unique: true,
+    sparse: true,
+  },
   paymentStatus: {
     type: String,
     enum: ["pending", "paid", "confirmed"],

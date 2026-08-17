@@ -99,6 +99,8 @@ export async function PUT(request) {
     // Update fields manually
     if (paymentStatus) rsvp.paymentStatus = paymentStatus;
     if (notes !== undefined) rsvp.notes = notes;
+    if (body.address !== undefined) rsvp.address = body.address;
+    if (body.organization) rsvp.organization = body.organization;
     if (mealSelectionToken) rsvp.mealSelectionToken = mealSelectionToken;
     if (typeof mealSelectionComplete === "boolean")
       rsvp.mealSelectionComplete = mealSelectionComplete;

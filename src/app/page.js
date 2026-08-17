@@ -127,6 +127,7 @@ const [selectedOrg, setSelectedOrg] = useState(null);
           phone: formData.phone,
           totalAmount: calculateTotal(),
           totalGuests: formData.under5 + formData.age5to12 + formData.age12plus,
+          bookingRef: data.bookingRef || "",
         });
 
         // Show success modal
@@ -1576,6 +1577,56 @@ const [selectedOrg, setSelectedOrg] = useState(null);
                       </div>
                     </div>
                   </div>
+
+                  {/* Booking Reference */}
+                  {submittedData?.bookingRef && (
+                    <div style={{
+                      background: "#111827",
+                      border: "1px solid #374151",
+                      borderRadius: "8px",
+                      padding: "10px 16px",
+                      marginBottom: "12px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}>
+                      <div>
+                        <div style={{
+                          color: "#9ca3af",
+                          fontSize: "0.7rem",
+                          fontWeight: "600",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.5px",
+                          marginBottom: "2px",
+                        }}>
+                          Booking Reference
+                        </div>
+                        <div style={{
+                          color: "#f59e0b",
+                          fontSize: "1rem",
+                          fontWeight: "800",
+                          letterSpacing: "1px",
+                        }}>
+                          {submittedData.bookingRef}
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => navigator.clipboard.writeText(submittedData.bookingRef)}
+                        style={{
+                          padding: "6px 10px",
+                          background: "#374151",
+                          border: "none",
+                          borderRadius: "6px",
+                          color: "#9ca3af",
+                          fontSize: "0.75rem",
+                          cursor: "pointer",
+                          fontWeight: "600",
+                        }}
+                      >
+                        Copy
+                      </button>
+                    </div>
+                  )}
 
                   {/* Booking Details - Compact */}
                   <div

@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 import dbConnect from "../../../../lib/mongodb"; // 5 levels
 import Rsvp from "../../../../models/Rsvp";
+import Settings from "../../../../models/Settings";
 import { randomBytes } from "crypto";
 
 // Verify admin token (reuse from your existing admin routes)
@@ -79,7 +80,9 @@ export async function POST(request) {
     for (const rsvp of rsvpsNeedingTokens) {
       rsvp.mealSelectionToken = generateMealToken();
       rsvp.mealSelectionComplete = false;
-      rsvp.mealSelectionDeadline = new Date("2026-01-12T22:00:00Z");
+      // Use deadline from Settings if available
+      const settings = await Settings.findOne();
+      rsvp.mealSelectionDeadline = settings?.mealDeadline || new Date("2026-09-12T22:00:00.000Z");
       await rsvp.save();
       count++;
     }
