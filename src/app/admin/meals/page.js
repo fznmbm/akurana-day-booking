@@ -348,7 +348,7 @@ ${config.organization.name} Team`;
 
     if (
       !confirm(
-        `Update meal deadline for ALL ${stats.total} families to ${new Date(
+        `Update meal deadline for ALL ${calculatedStats.total} families to ${new Date(
           newDeadline,
         ).toLocaleString("en-GB")}?`,
       )
@@ -825,7 +825,27 @@ ${config.organization.name} Team`;
         )}
 
         {/* Stats Cards - Mobile Responsive */}
-        {stats && (
+        {stats && (() => {
+          const orgFilteredRsvps =
+            organizationFilter === "all"
+              ? rsvps
+              : rsvps.filter((r) => r.organization === organizationFilter);
+
+          const calculatedStats = {
+            total: orgFilteredRsvps.length,
+            completed: orgFilteredRsvps.filter((r) => r.mealSelectionComplete)
+              .length,
+            pending: orgFilteredRsvps.filter((r) => !r.mealSelectionComplete)
+              .length,
+          };
+          calculatedStats.percentage =
+            calculatedStats.total > 0
+              ? Math.round(
+                  (calculatedStats.completed / calculatedStats.total) * 100,
+                )
+              : 0;
+
+          return (
           <div
             style={{
               display: "grid",
@@ -860,7 +880,7 @@ ${config.organization.name} Team`;
                   color: "#f9fafb",
                 }}
               >
-                {stats.total}
+                {calculatedStats.total}
               </div>
               <div
                 style={{
@@ -899,7 +919,7 @@ ${config.organization.name} Team`;
                   color: "#10b981",
                 }}
               >
-                {stats.completed}
+                {calculatedStats.completed}
               </div>
               <div
                 style={{
@@ -909,7 +929,7 @@ ${config.organization.name} Team`;
                   fontWeight: "600",
                 }}
               >
-                {stats.percentage}% Complete
+                {calculatedStats.percentage}% Complete
               </div>
             </div>
 
@@ -939,7 +959,7 @@ ${config.organization.name} Team`;
                   color: "#f59e0b",
                 }}
               >
-                {stats.pending}
+                {calculatedStats.pending}
               </div>
               <div
                 style={{
@@ -952,10 +972,44 @@ ${config.organization.name} Team`;
               </div>
             </div>
           </div>
-        )}
+          );
+        })()}
 
         {/* Catering Totals */}
-        {mealTotals && (
+        {mealTotals && (() => {
+          const orgFilteredRsvps =
+            organizationFilter === "all"
+              ? rsvps
+              : rsvps.filter((r) => r.organization === organizationFilter);
+
+          const countMeal = (ageCategory, mealChoice) =>
+            orgFilteredRsvps.reduce(
+              (sum, r) =>
+                sum +
+                (r.mealSelections?.filter(
+                  (m) =>
+                    m.ageCategory === ageCategory &&
+                    m.mealChoice === mealChoice,
+                ).length || 0),
+              0,
+            );
+
+          const calculatedMealTotals = {
+            under5: {
+              "nuggets-chips": countMeal("under5", "nuggets-chips"),
+              "not-required": countMeal("under5", "not-required"),
+            },
+            age5to12: {
+              "rice-curry": countMeal("age5to12", "rice-curry"),
+              "burger-meal": countMeal("age5to12", "burger-meal"),
+            },
+            age12plus: {
+              "rice-curry": countMeal("age12plus", "rice-curry"),
+              "burger-meal": countMeal("age12plus", "burger-meal"),
+            },
+          };
+
+          return (
           <div
             style={{
               background: "#1f2937",
@@ -1017,7 +1071,7 @@ ${config.organization.name} Team`;
                     color: "#10b981",
                   }}
                 >
-                  {mealTotals.under5["nuggets-chips"]}
+                  {calculatedMealTotals.under5["nuggets-chips"]}
                 </div>
               </div>
               <div
@@ -1054,7 +1108,7 @@ ${config.organization.name} Team`;
                     color: "#6b7280",
                   }}
                 >
-                  {mealTotals.under5["not-required"]}
+                  {calculatedMealTotals.under5["not-required"]}
                 </div>
               </div>
 
@@ -1093,7 +1147,7 @@ ${config.organization.name} Team`;
                     color: "#667eea",
                   }}
                 >
-                  {mealTotals.age5to12["rice-curry"]}
+                  {calculatedMealTotals.age5to12["rice-curry"]}
                 </div>
               </div>
               <div
@@ -1130,7 +1184,7 @@ ${config.organization.name} Team`;
                     color: "#f59e0b",
                   }}
                 >
-                  {mealTotals.age5to12["burger-meal"]}
+                  {calculatedMealTotals.age5to12["burger-meal"]}
                 </div>
               </div>
 
@@ -1169,7 +1223,7 @@ ${config.organization.name} Team`;
                     color: "#667eea",
                   }}
                 >
-                  {mealTotals.age12plus["rice-curry"]}
+                  {calculatedMealTotals.age12plus["rice-curry"]}
                 </div>
               </div>
               <div
@@ -1206,12 +1260,13 @@ ${config.organization.name} Team`;
                     color: "#f59e0b",
                   }}
                 >
-                  {mealTotals.age12plus["burger-meal"]}
+                  {calculatedMealTotals.age12plus["burger-meal"]}
                 </div>
               </div>
             </div>
           </div>
-        )}
+          );
+        })()}
 
         {/* Search & Filters */}
         <div
