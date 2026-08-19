@@ -2027,7 +2027,7 @@ const [selectedOrg, setSelectedOrg] = useState(null);
               borderTop: "1px solid #374151",
             }}
           >
-            Designed & Developed by{" "}
+            Developed by{" "}
             <a
               href="https://elitestack.co.uk"
               target="_blank"
