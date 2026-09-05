@@ -3,19 +3,11 @@ import { NextResponse } from "next/server";
 import dbConnect from "../../../../lib/mongodb";
 import Rsvp from "../../../../models/Rsvp";
 import Settings from "../../../../models/Settings";
-
-function checkAuth(request) {
-  const authHeader = request.headers.get("authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return false;
-  }
-  const token = authHeader.substring(7);
-  return token && token.length > 0;
-}
+import { verifyAdminAuth } from "../../../../lib/auth";
 
 export async function POST(request) {
   try {
-    if (!checkAuth(request)) {
+    if (!verifyAdminAuth(request)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -83,7 +75,7 @@ export async function POST(request) {
 // GET - fetch current meal deadline
 export async function GET(request) {
   try {
-    if (!checkAuth(request)) {
+    if (!verifyAdminAuth(request)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

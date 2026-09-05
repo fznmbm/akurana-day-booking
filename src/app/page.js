@@ -1187,7 +1187,7 @@ const [selectedOrg, setSelectedOrg] = useState(null);
                         marginBottom: "8px",
                       }}
                     >
-                      Age 5 - 12
+                      Age 5 - 11
                     </label>
                     <div
                       style={{

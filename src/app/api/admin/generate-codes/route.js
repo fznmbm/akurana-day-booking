@@ -2,20 +2,12 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import dbConnect from "../../../../lib/mongodb";
 import Rsvp from "../../../../models/Rsvp";
-
-// Simple auth check
-function checkAuth(request) {
-  const authHeader = request.headers.get("authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return false;
-  }
-  return true;
-}
+import { verifyAdminAuth } from "../../../../lib/auth";
 
 // POST - Generate QR codes for existing paid RSVPs that don't have codes yet
 export async function POST(request) {
   try {
-    if (!checkAuth(request)) {
+    if (!verifyAdminAuth(request)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -67,7 +59,7 @@ export async function POST(request) {
 // GET - Check how many RSVPs need codes
 export async function GET(request) {
   try {
-    if (!checkAuth(request)) {
+    if (!verifyAdminAuth(request)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

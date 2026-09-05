@@ -276,7 +276,7 @@ export default function MealSelectionPage() {
                       marginBottom: "8px",
                     }}
                   >
-                    Age 5-12 ({rsvpData.age5to12}):
+                    Age 5-11 ({rsvpData.age5to12}):
                   </p>
                   {age5to12Meals.map((meal, i) => (
                     <div
@@ -438,7 +438,7 @@ export default function MealSelectionPage() {
                       marginBottom: "8px",
                     }}
                   >
-                    Age 5-12 ({rsvpData.age5to12}):
+                    Age 5-11 ({rsvpData.age5to12}):
                   </p>
                   {age5to12Meals.map((meal, i) => (
                     <div
@@ -528,7 +528,7 @@ export default function MealSelectionPage() {
                 <span>{rsvpData.under5}</span>
               </div>
               <div style={styles.detailRow}>
-                <span>Age 5-12:</span>
+                <span>Age 5-11:</span>
                 <span>{rsvpData.age5to12}</span>
               </div>
               <div style={styles.detailRow}>
@@ -682,10 +682,10 @@ export default function MealSelectionPage() {
           {rsvpData.age5to12 > 0 && (
             <div style={styles.section}>
               <h3 style={styles.sectionTitle}>
-                🧒 Age 5-12 ({rsvpData.age5to12})
+                🧒 Age 5-11 ({rsvpData.age5to12})
               </h3>
               <p style={styles.sectionDesc}>
-                Select meal preference for each person aged 5-12 years
+                Select meal preference for each person aged 5-11 years
               </p>
 
               {age5to12Meals.map((meal, index) => (

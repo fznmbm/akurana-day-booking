@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
+import { signAdminToken } from "../../../../lib/auth";
 
 export async function POST(request) {
   try {
@@ -20,17 +21,14 @@ export async function POST(request) {
       "$2a$10$aEngRh.DoqLF0CCN6F04UuiyejEyMo8bh9chbraT9SLM4k0Pj4GTq";
 
     // Compare password with hash
-    console.log("HASH IN USE:", adminPasswordHash);
-    console.log("PASSWORD:", password);
     const isValid = await bcrypt.compare(password, adminPasswordHash);
-    console.log("IS VALID:", isValid);
 
     if (!isValid) {
       return NextResponse.json({ error: "Invalid password" }, { status: 401 });
     }
 
-    // Generate a simple token
-    const token = Buffer.from(`admin:${Date.now()}`).toString("base64");
+    // Generate a signed, expiring token
+    const token = signAdminToken();
 
     return NextResponse.json({
       success: true,

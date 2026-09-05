@@ -3,17 +3,7 @@ import dbConnect from "../../../../lib/mongodb"; // 5 levels
 import Rsvp from "../../../../models/Rsvp";
 import Settings from "../../../../models/Settings";
 import { randomBytes } from "crypto";
-
-// Verify admin token (reuse from your existing admin routes)
-function verifyAdmin(request) {
-  const authHeader = request.headers.get("authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return false;
-  }
-  const token = authHeader.substring(7);
-  //return token === process.env.ADMIN_PASSWORD_HASH;
-  return token && token.length > 0;
-}
+import { verifyAdminAuth } from "../../../../lib/auth";
 
 // Generate unique token
 function generateMealToken() {
@@ -22,7 +12,7 @@ function generateMealToken() {
 
 // GET - Check how many RSVPs need tokens
 export async function GET(request) {
-  if (!verifyAdmin(request)) {
+  if (!verifyAdminAuth(request)) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -54,7 +44,7 @@ export async function GET(request) {
 
 // POST - Generate tokens for all paid RSVPs without tokens
 export async function POST(request) {
-  if (!verifyAdmin(request)) {
+  if (!verifyAdminAuth(request)) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 

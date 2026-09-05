@@ -2,21 +2,11 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import dbConnect from "../../../../lib/mongodb";
 import Rsvp from "../../../../models/Rsvp";
-
-// Simple auth check - FIXED to accept any valid Bearer token
-function checkAuth(request) {
-  const authHeader = request.headers.get("authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return false;
-  }
-  const token = authHeader.substring(7);
-  // Accept any non-empty token (since login generates dynamic tokens)
-  return token && token.length > 0;
-}
+import { verifyAdminAuth } from "../../../../lib/auth";
 
 export async function GET(request) {
   try {
-    if (!checkAuth(request)) {
+    if (!verifyAdminAuth(request)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -66,7 +56,7 @@ export async function GET(request) {
 
 export async function PUT(request) {
   try {
-    if (!checkAuth(request)) {
+    if (!verifyAdminAuth(request)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -125,7 +115,7 @@ export async function PUT(request) {
 
 export async function DELETE(request) {
   try {
-    if (!checkAuth(request)) {
+    if (!verifyAdminAuth(request)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

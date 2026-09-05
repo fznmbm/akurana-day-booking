@@ -231,7 +231,7 @@ ${mealLink}
 
 Your booking:
 - ${rsvp.under5} x Under 5
-- ${rsvp.age5to12} x Age 5-12
+- ${rsvp.age5to12} x Age 5-11
 - ${rsvp.age12plus} x Age 12+
 
 ⏰ Deadline: ${(() => {
@@ -270,8 +270,8 @@ ${config.organization.name} Team`;
       "Phone",
       "Under 5 - Nuggets",
       "Under 5 - Not Required",
-      "Age 5-12 - Rice & Curry",
-      "Age 5-12 - Burger Meal",
+      "Age 5-11 - Rice & Curry",
+      "Age 5-11 - Burger Meal",
       "Age 12+ - Rice & Curry",
       "Age 12+ - Burger Meal",
       "Dietary Requirements",
@@ -1129,7 +1129,7 @@ ${config.organization.name} Team`;
                     fontWeight: "600",
                   }}
                 >
-                  Age 5-12
+                  Age 5-11
                 </div>
                 <div
                   style={{
@@ -1166,7 +1166,7 @@ ${config.organization.name} Team`;
                     fontWeight: "600",
                   }}
                 >
-                  Age 5-12
+                  Age 5-11
                 </div>
                 <div
                   style={{
@@ -1936,7 +1936,7 @@ ${config.organization.name} Team`;
                         marginBottom: "8px",
                       }}
                     >
-                      Age 5-12 ({viewingMeal.age5to12}):
+                      Age 5-11 ({viewingMeal.age5to12}):
                     </h4>
                     {viewingMeal.mealSelections
                       ?.filter((m) => m.ageCategory === "age5to12")

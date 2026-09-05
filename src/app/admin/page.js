@@ -535,7 +535,7 @@ export default function AdminDashboard() {
       "Address",
       "Email",
       "Under 5",
-      "Age 5-12",
+      "Age 5-11",
       "Age 12+",
       "Total Amount",
       "Payment Status",
@@ -598,7 +598,7 @@ const copyForWhatsApp = () => {
       const date = new Date(rsvp.createdAt).toLocaleDateString("en-GB");
 
       message += `*${index + 1}. ${rsvp.name}*\n`;
-      message += `👥 U5: ${rsvp.under5} | 5-12: ${rsvp.age5to12} | 12+: ${rsvp.age12plus} *(${total} people)*\n\n`;
+      message += `👥 U5: ${rsvp.under5} | 5-11: ${rsvp.age5to12} | 12+: ${rsvp.age12plus} *(${total} people)*\n\n`;
     });
 
     const totalPeople = paidRsvps.reduce(
@@ -621,7 +621,7 @@ const copyForWhatsApp = () => {
     message += `👨‍👩‍👧‍👦 Total Families: ${paidRsvps.length}\n`;
     message += `👥 Total People: ${totalPeople}\n`;
     message += `   • Under 5: ${totalUnder5}\n`;
-    message += `   • Age 5-12: ${totalAge5to12}\n`;
+    message += `   • Age 5-11: ${totalAge5to12}\n`;
     message += `   • Age 12+: ${totalAge12plus}\n`;
 
     if (pendingRsvps.length > 0) {
@@ -1152,7 +1152,7 @@ const copyForWhatsApp = () => {
                   note: "FREE",
                 },
                 {
-                  label: "Age 5-12",
+                  label: "Age 5-11",
                   value: calculatedStats.totalAge5to12,
                   color: "#06b6d4",
                   note: `${config.pricing.symbol}${config.pricing.tiers.find((t) => t.id === "child").price} each`,
@@ -2256,7 +2256,7 @@ const copyForWhatsApp = () => {
                               fontWeight: "600",
                             }}
                           >
-                            5-12: {rsvp.age5to12}
+                            5-11: {rsvp.age5to12}
                           </span>
                           <span
                             style={{
@@ -2755,7 +2755,7 @@ const copyForWhatsApp = () => {
                         fontWeight: "600",
                       }}
                     >
-                      5-12: {rsvp.age5to12}
+                      5-11: {rsvp.age5to12}
                     </span>
                     <span
                       style={{

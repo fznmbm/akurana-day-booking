@@ -1,20 +1,10 @@
 export const dynamic = "force-dynamic";
 import dbConnect from "../../../../lib/mongodb"; // 5 levels
 import Rsvp from "../../../../models/Rsvp";
-
-// Verify admin token
-function verifyAdmin(request) {
-  const authHeader = request.headers.get("authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return false;
-  }
-  const token = authHeader.substring(7);
-  //return token === process.env.ADMIN_PASSWORD_HASH;
-  return token && token.length > 0;
-}
+import { verifyAdminAuth } from "../../../../lib/auth";
 
 export async function GET(request) {
-  if (!verifyAdmin(request)) {
+  if (!verifyAdminAuth(request)) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -27,20 +17,7 @@ export async function GET(request) {
       mealSelectionToken: { $exists: true },
     }).sort({ createdAt: 1 });
 
-    // Debug logging
-    console.log("===========================================");
-    console.log("MEAL SUMMARY API - DEBUG");
-    console.log("Total RSVPs found:", paidRsvps.length);
-    if (paidRsvps.length > 0) {
-      console.log("First RSVP:");
-      console.log("  Name:", paidRsvps[0].name);
-      console.log("  Deadline:", paidRsvps[0].mealSelectionDeadline);
-      console.log(
-        "  Deadline type:",
-        typeof paidRsvps[0].mealSelectionDeadline,
-      );
-    }
-    console.log("===========================================");
+
 
     // Calculate stats
     const total = paidRsvps.length;

@@ -2,20 +2,12 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import dbConnect from "../../../../lib/mongodb";
 import Settings from "../../../../models/Settings";
-
-// Simple auth check (same as rsvps route)
-function checkAuth(request) {
-  const authHeader = request.headers.get("authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return false;
-  }
-  return true;
-}
+import { verifyAdminAuth } from "../../../../lib/auth";
 
 // GET - Fetch current settings
 export async function GET(request) {
   try {
-    if (!checkAuth(request)) {
+    if (!verifyAdminAuth(request)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -48,7 +40,7 @@ export async function GET(request) {
 // PUT - Update settings
 export async function PUT(request) {
   try {
-    if (!checkAuth(request)) {
+    if (!verifyAdminAuth(request)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
