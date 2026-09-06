@@ -193,11 +193,15 @@ export default function AdminDashboard() {
       const data = await response.json();
       if (response.ok) {
         setSettings(data.data);
-        // Convert UTC to local time for datetime-local input
-        const utcDate = new Date(data.data.rsvpDeadline);
-        setNewDeadline(
-          new Date(data.data.rsvpDeadline).toISOString().slice(0, 16),
-        );
+        // Convert stored UTC deadline to the browser's local time for the datetime-local input
+        const localDate = new Date(data.data.rsvpDeadline);
+        const pad = (n) => String(n).padStart(2, "0");
+        const localDeadlineString = `${localDate.getFullYear()}-${pad(
+          localDate.getMonth() + 1,
+        )}-${pad(localDate.getDate())}T${pad(localDate.getHours())}:${pad(
+          localDate.getMinutes(),
+        )}`;
+        setNewDeadline(localDeadlineString);
       }
     } catch (error) {
       console.error("Failed to fetch settings:", error);
@@ -324,13 +328,15 @@ export default function AdminDashboard() {
   const updateDeadline = async () => {
     try {
       const token = localStorage.getItem("adminToken");
+      // Convert the local datetime-local value to a true UTC ISO string
+      const utcDeadline = new Date(newDeadline).toISOString();
       const response = await fetch("/api/admin/settings", {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ rsvpDeadline: newDeadline }),
+        body: JSON.stringify({ rsvpDeadline: utcDeadline }),
       });
 
       if (response.ok) {
@@ -1577,18 +1583,17 @@ const copyForWhatsApp = () => {
                   <strong style={{ color: "#f3f4f6" }} suppressHydrationWarning>
                     {(() => {
                       const date = new Date(settings.rsvpDeadline);
-                      const day = date.getUTCDate();
+                      const day = date.getDate();
                       const month = date.toLocaleDateString("en-GB", {
                         month: "short",
-                        timeZone: "UTC",
                       });
-                      const year = date.getUTCFullYear();
-                      const hours = String(date.getUTCHours()).padStart(2, "0");
-                      const minutes = String(date.getUTCMinutes()).padStart(
+                      const year = date.getFullYear();
+                      const hours = String(date.getHours()).padStart(2, "0");
+                      const minutes = String(date.getMinutes()).padStart(
                         2,
                         "0",
                       );
-                      return `${day} ${month} ${year}, ${hours}:${minutes}`;
+                      return `${day} ${month} ${year}, ${hours}:${minutes} (UK time)`;
                     })()}
                   </strong>
                   {" • "}

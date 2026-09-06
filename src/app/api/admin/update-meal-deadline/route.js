@@ -22,7 +22,8 @@ export async function POST(request) {
       );
     }
 
-    const newDeadline = new Date(deadline + ':00.000Z');
+    // Client now sends a fully-qualified UTC ISO string
+    const newDeadline = new Date(deadline);
 
     if (isNaN(newDeadline.getTime())) {
       return NextResponse.json(

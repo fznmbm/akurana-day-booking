@@ -172,9 +172,14 @@ export default function AdminMealsPage() {
       const data = await response.json();
       if (response.ok && data.mealDeadline) {
         setCurrentDeadline(data.mealDeadline);
-        // Use UTC time for datetime-local input to avoid timezone issues
+        // Convert stored UTC deadline to the browser's local time for the datetime-local input
         const date = new Date(data.mealDeadline);
-        const formatted = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}-${String(date.getUTCDate()).padStart(2, "0")}T${String(date.getUTCHours()).padStart(2, "0")}:${String(date.getUTCMinutes()).padStart(2, "0")}`;
+        const pad = (n) => String(n).padStart(2, "0");
+        const formatted = `${date.getFullYear()}-${pad(
+          date.getMonth() + 1,
+        )}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(
+          date.getMinutes(),
+        )}`;
         setNewDeadline(formatted);
       }
     } catch (error) {
@@ -236,12 +241,12 @@ Your booking:
 
 ⏰ Deadline: ${(() => {
   const date = new Date(currentDeadline);
-  const day = date.getUTCDate();
-  const month = date.toLocaleDateString("en-GB", { month: "long", timeZone: "UTC" });
-  const year = date.getUTCFullYear();
-  const hours = String(date.getUTCHours()).padStart(2, "0");
-  const minutes = String(date.getUTCMinutes()).padStart(2, "0");
-  const weekday = date.toLocaleDateString("en-GB", { weekday: "long", timeZone: "UTC" });
+  const day = date.getDate();
+  const month = date.toLocaleDateString("en-GB", { month: "long" });
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const weekday = date.toLocaleDateString("en-GB", { weekday: "long" });
   return `${weekday}, ${day} ${month} ${year} at ${hours}:${minutes}`;
 })()}
 
@@ -346,11 +351,14 @@ ${config.organization.name} Team`;
       return;
     }
 
+    // Convert the local datetime-local value to a true UTC ISO string
+    const utcDeadline = new Date(newDeadline).toISOString();
+
     if (
       !confirm(
-        `Update meal deadline for ALL ${calculatedStats.total} families to ${new Date(
-          newDeadline,
-        ).toLocaleString("en-GB")}?`,
+        `Update meal deadline for ALL ${
+          stats?.total || 0
+        } families to ${new Date(newDeadline).toLocaleString("en-GB")}?`,
       )
     ) {
       return;
@@ -365,7 +373,7 @@ ${config.organization.name} Team`;
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ deadline: newDeadline, organization: organizationFilter }),
+        body: JSON.stringify({ deadline: utcDeadline, organization: organizationFilter }),
       });
 
       const data = await response.json();
@@ -594,13 +602,13 @@ ${config.organization.name} Team`;
                 >
                   {(() => {
                     const date = new Date(currentDeadline);
-                    const weekday = date.toLocaleDateString("en-GB", { weekday: "long", timeZone: "UTC" });
-                    const day = date.getUTCDate();
-                    const month = date.toLocaleDateString("en-GB", { month: "long", timeZone: "UTC" });
-                    const year = date.getUTCFullYear();
-                    const hours = String(date.getUTCHours()).padStart(2, "0");
-                    const minutes = String(date.getUTCMinutes()).padStart(2, "0");
-                    return `${weekday}, ${day} ${month} ${year} at ${hours}:${minutes}`;
+                    const weekday = date.toLocaleDateString("en-GB", { weekday: "long" });
+                    const day = date.getDate();
+                    const month = date.toLocaleDateString("en-GB", { month: "long" });
+                    const year = date.getFullYear();
+                    const hours = String(date.getHours()).padStart(2, "0");
+                    const minutes = String(date.getMinutes()).padStart(2, "0");
+                    return `${weekday}, ${day} ${month} ${year} at ${hours}:${minutes} (UK time)`;
                   })()}
                 </p>
               ) : (
@@ -1531,7 +1539,7 @@ ${config.organization.name} Team`;
                       </td>
                       <td style={{ padding: "16px", textAlign: "center" }}>
                         <div style={{ fontSize: "0.875rem", color: "#f3f4f6" }}>
-                          U5: {rsvp.under5} | 5-12: {rsvp.age5to12} | 12+:{" "}
+                          U5: {rsvp.under5} | 5-11: {rsvp.age5to12} | 12+:{" "}
                           {rsvp.age12plus}
                         </div>
                         <div
@@ -1742,7 +1750,7 @@ ${config.organization.name} Team`;
                         fontWeight: "600",
                       }}
                     >
-                      5-12: {rsvp.age5to12}
+                      5-11: {rsvp.age5to12}
                     </span>
                     <span
                       style={{

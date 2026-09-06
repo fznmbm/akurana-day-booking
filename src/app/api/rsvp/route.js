@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import dbConnect from "../../../lib/mongodb";
 import Rsvp from "../../../models/Rsvp";
+import Settings from "../../../models/Settings";
 import { getConfig } from "../../../config";
 
 export async function POST(request) {
@@ -10,6 +11,22 @@ export async function POST(request) {
     const config = getConfig();
 
     const body = await request.json();
+
+    // Check RSVP deadline before accepting any submission
+    const settings = await Settings.findOne();
+    if (settings) {
+      const now = new Date();
+      const deadlinePassed = now > new Date(settings.rsvpDeadline);
+      if (deadlinePassed || settings.rsvpEnabled === false) {
+        return NextResponse.json(
+          {
+            error:
+              "The RSVP deadline has passed. New bookings are no longer accepted.",
+          },
+          { status: 403 },
+        );
+      }
+    }
 
     // Validate required fields
     if (!body.name || !body.phone) {

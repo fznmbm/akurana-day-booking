@@ -58,8 +58,8 @@ export async function PUT(request) {
       });
     } else {
       if (rsvpDeadline !== undefined) {
-        // Treat as UTC directly - append Z to force UTC interpretation
-        settings.rsvpDeadline = new Date(rsvpDeadline + ":00.000Z");
+        // Client now sends a fully-qualified UTC ISO string
+        settings.rsvpDeadline = new Date(rsvpDeadline);
       }
       if (rsvpEnabled !== undefined) settings.rsvpEnabled = rsvpEnabled;
       settings.updatedAt = new Date();
