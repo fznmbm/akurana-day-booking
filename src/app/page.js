@@ -66,6 +66,8 @@ const [selectedOrg, setSelectedOrg] = useState(null);
   // Fetch deadline and attendee info
   useEffect(() => {
     fetchDeadlineInfo();
+    const interval = setInterval(fetchDeadlineInfo, 30000); // Refresh every 30 seconds
+    return () => clearInterval(interval);
   }, []);
 
   const fetchDeadlineInfo = async () => {
