@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import dbConnect from "../../../../lib/mongodb";
 import Rsvp from "../../../../models/Rsvp";
+import Settings from "../../../../models/Settings";
 import { verifyAdminAuth } from "../../../../lib/auth";
 
 export async function GET(request) {
@@ -91,11 +92,16 @@ export async function PUT(request) {
     if (notes !== undefined) rsvp.notes = notes;
     if (body.address !== undefined) rsvp.address = body.address;
     if (body.organization) rsvp.organization = body.organization;
-    if (mealSelectionToken) rsvp.mealSelectionToken = mealSelectionToken;
+    if (mealSelectionToken) {
+      rsvp.mealSelectionToken = mealSelectionToken;
+      // Always pull the real meal deadline from Settings — never trust a
+      // client-supplied value, so a stale/hardcoded date can't slip through.
+      const settings = await Settings.findOne();
+      rsvp.mealSelectionDeadline =
+        settings?.mealDeadline || new Date("2026-09-12T22:00:00.000Z");
+    }
     if (typeof mealSelectionComplete === "boolean")
       rsvp.mealSelectionComplete = mealSelectionComplete;
-    if (mealSelectionDeadline)
-      rsvp.mealSelectionDeadline = mealSelectionDeadline;
 
     // Save to trigger pre-save hook
     await rsvp.save();

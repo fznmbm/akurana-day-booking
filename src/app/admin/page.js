@@ -436,12 +436,10 @@ export default function AdminDashboard() {
       const updateData = { id, paymentStatus: status };
 
       // If marking as paid, generate meal token
+      // (the server assigns the correct meal deadline from Settings)
       if (status === "paid") {
         updateData.mealSelectionToken = generateMealToken();
         updateData.mealSelectionComplete = false;
-        updateData.mealSelectionDeadline = new Date(
-          "2026-01-12T22:00:00Z",
-        ).toISOString();
       }
 
       const response = await fetch("/api/admin/rsvps", {
