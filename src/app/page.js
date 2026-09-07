@@ -527,14 +527,13 @@ const [selectedOrg, setSelectedOrg] = useState(null);
             {deadlineInfo?.deadline
               ? (() => {
                   const date = new Date(deadlineInfo.deadline);
-                  const day = date.getUTCDate();
+                  const day = date.getDate();
                   const month = date.toLocaleDateString("en-GB", {
                     month: "long",
-                    timeZone: "UTC",
                   });
-                  const year = date.getUTCFullYear();
-                  const hours = String(date.getUTCHours()).padStart(2, "0");
-                  const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+                  const year = date.getFullYear();
+                  const hours = String(date.getHours()).padStart(2, "0");
+                  const minutes = String(date.getMinutes()).padStart(2, "0");
                   return `${day} ${month} ${year} at ${hours}:${minutes}`;
                 })()
               : "Loading..."}
@@ -580,14 +579,13 @@ const [selectedOrg, setSelectedOrg] = useState(null);
                 <strong>
                   {(() => {
                     const date = new Date(deadlineInfo.deadline);
-                    const day = date.getUTCDate();
+                    const day = date.getDate();
                     const month = date.toLocaleDateString("en-GB", {
                       month: "long",
-                      timeZone: "UTC",
                     });
-                    const year = date.getUTCFullYear();
-                    const hours = String(date.getUTCHours()).padStart(2, "0");
-                    const minutes = String(date.getUTCMinutes()).padStart(
+                    const year = date.getFullYear();
+                    const hours = String(date.getHours()).padStart(2, "0");
+                    const minutes = String(date.getMinutes()).padStart(
                       2,
                       "0",
                     );
