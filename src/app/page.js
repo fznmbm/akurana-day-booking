@@ -192,6 +192,8 @@ const [selectedOrg, setSelectedOrg] = useState(null);
           totalAmount: calculateTotal(),
           totalGuests: formData.under5 + formData.age5to12 + formData.age12plus,
           bookingRef: data.bookingRef || "",
+          paymentProofReference: formData.paymentProofReference,
+          receiptFileName: receiptFile?.name || "",
         });
 
         // Show success modal
@@ -1411,9 +1413,8 @@ const [selectedOrg, setSelectedOrg] = useState(null);
                     marginBottom: "16px",
                   }}
                 >
-                  ⚠️ Please transfer the amount above using the bank details
-                  shown earlier, then enter your reference and upload proof
-                  below. Your booking cannot be submitted without it.
+                  ⚠️ Please transfer the amount using the bank details
+                  shown and upload proof below. Your booking cannot be submitted without it.
                 </p>
 
                 <label
@@ -1913,7 +1914,7 @@ const [selectedOrg, setSelectedOrg] = useState(null);
                     </div>
                   </div>
 
-                  {/* Payment Instructions - Compact */}
+                  {/* Payment Recorded - Compact, no repeated data */}
                   {submittedData.totalAmount > 0 && (
                     <div
                       style={{
@@ -1929,7 +1930,7 @@ const [selectedOrg, setSelectedOrg] = useState(null);
                           display: "flex",
                           alignItems: "center",
                           gap: "8px",
-                          marginBottom: "8px",
+                          marginBottom: "10px",
                         }}
                       >
                         <div
@@ -1945,7 +1946,7 @@ const [selectedOrg, setSelectedOrg] = useState(null);
                             flexShrink: 0,
                           }}
                         >
-                          💳
+                          🧾
                         </div>
                         <h3
                           style={{
@@ -1955,7 +1956,7 @@ const [selectedOrg, setSelectedOrg] = useState(null);
                             margin: 0,
                           }}
                         >
-                          Your Payment Details
+                          Payment Recorded
                         </h3>
                       </div>
 
@@ -1964,119 +1965,23 @@ const [selectedOrg, setSelectedOrg] = useState(null);
                           background: "rgba(0, 0, 0, 0.3)",
                           borderRadius: "8px",
                           padding: "10px",
-                          marginBottom: "8px",
-                          fontSize: "0.75rem",
-                          lineHeight: "1.5",
+                          fontSize: "0.8rem",
+                          lineHeight: "1.6",
                         }}
                       >
-                        <div style={{ marginBottom: "4px" }}>
-                          <strong style={{ color: "#f3f4f6" }}>Bank: </strong>
-                          <span style={{ color: "#d1d5db" }}>
-                            {config.payment.bankName}
-                          </span>
-                        </div>
-
-                        <div style={{ marginBottom: "4px" }}>
+                        <div>
                           <strong style={{ color: "#f3f4f6" }}>
-                            Account:{" "}
+                            Your Reference:{" "}
                           </strong>
                           <span style={{ color: "#d1d5db" }}>
-                            {config.payment.accountName}
+                            {submittedData.paymentProofReference || "—"}
                           </span>
                         </div>
-
-                        <div
-                          style={{
-                            display: "grid",
-                            gridTemplateColumns: "1fr 1fr",
-                            gap: "8px",
-                            marginBottom: "4px",
-                          }}
-                        >
-                          <div>
-                            <strong
-                              style={{ color: "#f3f4f6", display: "block" }}
-                            >
-                              Account No:
-                            </strong>
-                            <span
-                              style={{
-                                color: "#d1d5db",
-                                fontFamily: "monospace",
-                              }}
-                            >
-                              {config.payment.accountNumber}
-                            </span>
+                        {submittedData.receiptFileName && (
+                          <div style={{ marginTop: "4px", color: "#10b981" }}>
+                            ✓ Receipt uploaded ({submittedData.receiptFileName})
                           </div>
-                          <div>
-                            <strong
-                              style={{ color: "#f3f4f6", display: "block" }}
-                            >
-                              Sort Code:
-                            </strong>
-                            <span
-                              style={{
-                                color: "#d1d5db",
-                                fontFamily: "monospace",
-                              }}
-                            >
-                              {config.payment.sortCode}
-                            </span>
-                          </div>
-                        </div>
-
-                        <div style={{ marginBottom: "4px" }}>
-                          <strong style={{ color: "#f3f4f6" }}>
-                            Reference:{" "}
-                          </strong>
-                          <span style={{ color: "#d1d5db" }}>
-                            {submittedData.name}
-                          </span>
-                        </div>
-
-                        <div
-                          style={{
-                            marginTop: "8px",
-                            paddingTop: "8px",
-                            borderTop: "1px solid rgba(255, 255, 255, 0.1)",
-                          }}
-                        >
-                          <strong style={{ color: "#f3f4f6" }}>Amount: </strong>
-                          <span
-                            style={{
-                              color: "#10b981",
-                              fontWeight: "700",
-                              fontSize: "1rem",
-                            }}
-                          >
-                            £{submittedData.totalAmount}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div
-                        style={{
-                          background: "rgba(245, 158, 11, 0.1)",
-                          border: "1px solid rgba(245, 158, 11, 0.3)",
-                          borderRadius: "8px",
-                          padding: "8px",
-                          fontSize: "0.75rem",
-                          color: "#fbbf24",
-                          textAlign: "center",
-                        }}
-                      >
-                        ⏰ Payment reference submitted{" "}
-                        {deadlineInfo?.deadline
-                          ? (() => {
-                              const date = new Date(deadlineInfo.deadline);
-                              const day = date.getDate();
-                              const month = date.toLocaleDateString("en-GB", { month: "short" });
-                              const year = date.getFullYear();
-                              const hours = String(date.getHours()).padStart(2, "0");
-                              const minutes = String(date.getMinutes()).padStart(2, "0");
-                              return `— booked before ${day} ${month} ${year} at ${hours}:${minutes} deadline`;
-                            })()
-                          : ""}
+                        )}
                       </div>
                     </div>
                   )}
