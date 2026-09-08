@@ -325,6 +325,28 @@ export default function AdminDashboard() {
     link.click();
   };
 
+  const viewReceipt = async (rsvpId) => {
+    try {
+      const token = localStorage.getItem("adminToken");
+      const response = await fetch(`/api/admin/receipt-url?id=${rsvpId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (response.ok && data.url) {
+        window.open(data.url, "_blank");
+      } else {
+        setMessage({
+          type: "error",
+          text: data.error || "Failed to load receipt",
+        });
+        setTimeout(() => setMessage({ type: "", text: "" }), 3000);
+      }
+    } catch (error) {
+      setMessage({ type: "error", text: "Failed to load receipt" });
+      setTimeout(() => setMessage({ type: "", text: "" }), 3000);
+    }
+  };
+
   const updateDeadline = async () => {
     try {
       const token = localStorage.getItem("adminToken");
@@ -2309,6 +2331,35 @@ const copyForWhatsApp = () => {
                             Ref: {rsvp.paymentReference}
                           </div>
                         )}
+                        {rsvp.paymentProofReference && (
+                          <div
+                            style={{
+                              fontSize: "0.75rem",
+                              color: "#9ca3af",
+                              marginTop: "2px",
+                            }}
+                          >
+                            Their ref: {rsvp.paymentProofReference}
+                          </div>
+                        )}
+                        {rsvp.receiptFileKey && (
+                          <button
+                            onClick={() => viewReceipt(rsvp._id)}
+                            style={{
+                              marginTop: "6px",
+                              padding: "6px 10px",
+                              background: "#374151",
+                              color: "#f3f4f6",
+                              border: "1px solid #4b5563",
+                              borderRadius: "6px",
+                              fontSize: "0.7rem",
+                              cursor: "pointer",
+                              fontWeight: "600",
+                            }}
+                          >
+                            🧾 View Receipt
+                          </button>
+                        )}
                       </td>
                       <td style={{ padding: "16px" }}>
                         {getStatusBadge(rsvp.paymentStatus, rsvp._id)}
@@ -2827,6 +2878,35 @@ const copyForWhatsApp = () => {
                       >
                         Ref: {rsvp.paymentReference}
                       </div>
+                    )}
+                    {rsvp.paymentProofReference && (
+                      <div
+                        style={{
+                          fontSize: "0.75rem",
+                          color: "#6b7280",
+                          marginTop: "2px",
+                        }}
+                      >
+                        Their ref: {rsvp.paymentProofReference}
+                      </div>
+                    )}
+                    {rsvp.receiptFileKey && (
+                      <button
+                        onClick={() => viewReceipt(rsvp._id)}
+                        style={{
+                          marginTop: "6px",
+                          padding: "6px 10px",
+                          background: "#374151",
+                          color: "#f3f4f6",
+                          border: "1px solid #4b5563",
+                          borderRadius: "6px",
+                          fontSize: "0.7rem",
+                          cursor: "pointer",
+                          fontWeight: "600",
+                        }}
+                      >
+                        🧾 View Receipt
+                      </button>
                     )}
                   </div>
 

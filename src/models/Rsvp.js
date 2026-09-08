@@ -51,6 +51,19 @@ const RsvpSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+  paymentProofReference: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+  receiptFileKey: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+  receiptUploadedAt: {
+    type: Date,
+  },2301
   bookingRef: {
     type: String,
     trim: true,

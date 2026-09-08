@@ -19,8 +19,12 @@ const [selectedOrg, setSelectedOrg] = useState(null);
     age5to12: 0,
     age12plus: 0,
     paymentReference: "",
+    paymentProofReference: "",
     notes: "",
   });
+
+  const [receiptFile, setReceiptFile] = useState(null);
+  const [receiptError, setReceiptError] = useState("");
 
   // ✅ STEP 3: Declare config THIRD - initialize with contextConfig so never null
   const contextConfig = useConfig();
@@ -103,21 +107,79 @@ const [selectedOrg, setSelectedOrg] = useState(null);
     }));
   };
 
+  const ALLOWED_RECEIPT_TYPES = [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/heic",
+    "image/heif",
+    "application/pdf",
+  ];
+  const MAX_RECEIPT_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
+
+  const handleReceiptChange = (e) => {
+    const file = e.target.files?.[0];
+    setReceiptError("");
+    if (!file) {
+      setReceiptFile(null);
+      return;
+    }
+    if (!ALLOWED_RECEIPT_TYPES.includes(file.type)) {
+      setReceiptError("Please upload an image (JPG/PNG/WEBP/HEIC) or a PDF");
+      setReceiptFile(null);
+      e.target.value = "";
+      return;
+    }
+    if (file.size > MAX_RECEIPT_SIZE_BYTES) {
+      setReceiptError("File is too large (max 5MB)");
+      setReceiptFile(null);
+      e.target.value = "";
+      return;
+    }
+    setReceiptFile(file);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!formData.paymentProofReference) {
+      setMessage({
+        type: "error",
+        text: "Please enter your payment reference",
+      });
+      return;
+    }
+    if (!receiptFile) {
+      setMessage({
+        type: "error",
+        text: "Please upload a screenshot or PDF of your payment receipt",
+      });
+      return;
+    }
+
     setLoading(true);
     setMessage({ type: "", text: "" });
 
     try {
+      const submitData = new FormData();
+      submitData.append("organization", selectedOrg);
+      submitData.append("name", formData.name);
+      submitData.append("phone", formData.phone);
+      submitData.append("address", formData.address);
+      submitData.append("email", formData.email);
+      submitData.append("under5", formData.under5);
+      submitData.append("age5to12", formData.age5to12);
+      submitData.append("age12plus", formData.age12plus);
+      submitData.append("notes", formData.notes);
+      submitData.append(
+        "paymentProofReference",
+        formData.paymentProofReference,
+      );
+      submitData.append("receipt", receiptFile);
+
       const response = await fetch("/api/rsvp", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...formData,
-          organization: selectedOrg,  // ADD THIS
-        }),
+        body: submitData,
       });
 
       const data = await response.json();
@@ -137,15 +199,20 @@ const [selectedOrg, setSelectedOrg] = useState(null);
 
         // Reset form
         setFormData({
+          organization: selectedOrg,
           name: "",
           phone: "",
+          address: "",
           email: "",
           under5: 0,
           age5to12: 0,
           age12plus: 0,
           paymentReference: "",
+          paymentProofReference: "",
           notes: "",
         });
+        setReceiptFile(null);
+        setReceiptError("");
 
         // Clear any previous messages
         setMessage({ type: "", text: "" });
@@ -317,8 +384,11 @@ const [selectedOrg, setSelectedOrg] = useState(null);
                       age5to12: 0,
                       age12plus: 0,
                       paymentReference: "",
+                      paymentProofReference: "",
                       notes: "",
                     });
+                    setReceiptFile(null);
+                    setReceiptError("");
                   }}
                   style={{
                     padding: "clamp(8px, 2vw, 12px) clamp(4px, 1.5vw, 8px)",
@@ -938,6 +1008,124 @@ const [selectedOrg, setSelectedOrg] = useState(null);
                   </p>
                 ))}
               </div>
+
+              {/* Proof of Payment - Required */}
+              <div
+                style={{
+                  marginTop: "20px",
+                  paddingTop: "16px",
+                  borderTop: "1px solid #374151",
+                }}
+              >
+                <p
+                  style={{
+                    color: "#fbbf24",
+                    fontSize: "0.85rem",
+                    fontWeight: "600",
+                    marginBottom: "12px",
+                  }}
+                >
+                  ⚠️ After transferring the payment above, please provide proof
+                  below. Your booking cannot be submitted without it.
+                </p>
+
+                <label
+                  style={{
+                    display: "block",
+                    color: "#f3f4f6",
+                    marginBottom: "8px",
+                    fontSize: "0.875rem",
+                    fontWeight: "500",
+                  }}
+                >
+                  Your Payment Reference *
+                </label>
+                <input
+                  type="text"
+                  name="paymentProofReference"
+                  value={formData.paymentProofReference}
+                  onChange={handleChange}
+                  required
+                  placeholder="e.g. the reference/name used in the bank transfer"
+                  style={{
+                    width: "100%",
+                    padding: "12px",
+                    background: "#111827",
+                    border: "1px solid #374151",
+                    borderRadius: "6px",
+                    color: "#f3f4f6",
+                    fontSize: "0.9rem",
+                    outline: "none",
+                    boxSizing: "border-box",
+                    marginBottom: "16px",
+                  }}
+                />
+
+                <label
+                  style={{
+                    display: "block",
+                    color: "#f3f4f6",
+                    marginBottom: "8px",
+                    fontSize: "0.875rem",
+                    fontWeight: "500",
+                  }}
+                >
+                  Upload Payment Receipt *
+                </label>
+                <input
+                  type="file"
+                  name="receipt"
+                  accept="image/*,.pdf"
+                  onChange={handleReceiptChange}
+                  required
+                  style={{
+                    width: "100%",
+                    padding: "10px",
+                    background: "#111827",
+                    border: "1px solid #374151",
+                    borderRadius: "6px",
+                    color: "#f3f4f6",
+                    fontSize: "0.85rem",
+                    outline: "none",
+                    boxSizing: "border-box",
+                  }}
+                />
+                {receiptFile && (
+                  <p
+                    style={{
+                      color: "#10b981",
+                      fontSize: "0.8rem",
+                      marginTop: "6px",
+                      marginBottom: 0,
+                    }}
+                  >
+                    ✓ {receiptFile.name}
+                  </p>
+                )}
+                {receiptError && (
+                  <p
+                    style={{
+                      color: "#ef4444",
+                      fontSize: "0.8rem",
+                      marginTop: "6px",
+                      marginBottom: 0,
+                    }}
+                  >
+                    {receiptError}
+                  </p>
+                )}
+                <p
+                  style={{
+                    color: "#6b7280",
+                    fontSize: "0.75rem",
+                    marginTop: "8px",
+                    marginBottom: 0,
+                  }}
+                >
+                  Screenshot or PDF of your bank transfer confirmation (max
+                  5MB).
+                </p>
+              </div>
             </div>
 
             {/* Form */}
@@ -1383,25 +1571,38 @@ const [selectedOrg, setSelectedOrg] = useState(null);
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={loading}
+                disabled={
+                  loading || !formData.paymentProofReference || !receiptFile
+                }
                 style={{
                   width: "100%",
                   padding: "14px",
-                  background: loading ? "#4b5563" : "#667eea",
+                  background:
+                    loading || !formData.paymentProofReference || !receiptFile
+                      ? "#4b5563"
+                      : "#667eea",
                   color: "white",
                   border: "none",
                   borderRadius: "8px",
                   fontSize: "1rem",
                   fontWeight: "600",
-                  cursor: loading ? "not-allowed" : "pointer",
+                  cursor:
+                    loading || !formData.paymentProofReference || !receiptFile
+                      ? "not-allowed"
+                      : "pointer",
                   transition: "background 0.2s",
-                  opacity: loading ? 0.6 : 1,
+                  opacity:
+                    loading || !formData.paymentProofReference || !receiptFile
+                      ? 0.6
+                      : 1,
                 }}
                 onMouseEnter={(e) => {
-                  if (!loading) e.currentTarget.style.background = "#5568d3";
+                  if (!loading && formData.paymentProofReference && receiptFile)
+                    e.currentTarget.style.background = "#5568d3";
                 }}
                 onMouseLeave={(e) => {
-                  if (!loading) e.currentTarget.style.background = "#667eea";
+                  if (!loading && formData.paymentProofReference && receiptFile)
+                    e.currentTarget.style.background = "#667eea";
                 }}
               >
                 {loading ? "Submitting..." : "🎫 Submit RSVP"}
@@ -1519,7 +1720,7 @@ const [selectedOrg, setSelectedOrg] = useState(null);
                         letterSpacing: "0.5px",
                       }}
                     >
-                      RSVP Confirmed!
+                      Booking Received!
                     </h2>
 
                     <p
@@ -1573,7 +1774,9 @@ const [selectedOrg, setSelectedOrg] = useState(null);
                         fontSize: "0.8rem",
                         lineHeight: "1.5",
                       }}>
-                        Your booking will be confirmed once your payment is received. Please complete your bank transfer using the details below.
+                        Your booking is provisional. Your entry QR code and
+                        meal selection link will only be sent once your
+                        payment is verified.
                       </div>
                     </div>
                   </div>
@@ -1738,7 +1941,7 @@ const [selectedOrg, setSelectedOrg] = useState(null);
                             margin: 0,
                           }}
                         >
-                          Complete Payment
+                          Your Payment Details
                         </h3>
                       </div>
 
@@ -1848,18 +2051,18 @@ const [selectedOrg, setSelectedOrg] = useState(null);
                           textAlign: "center",
                         }}
                       >
-                        ⏰ Deadline:{" "}
+                        ⏰ Payment reference submitted{" "}
                         {deadlineInfo?.deadline
                           ? (() => {
                               const date = new Date(deadlineInfo.deadline);
-                              const day = date.getUTCDate();
-                              const month = date.toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" });
-                              const year = date.getUTCFullYear();
-                              const hours = String(date.getUTCHours()).padStart(2, "0");
-                              const minutes = String(date.getUTCMinutes()).padStart(2, "0");
-                              return `${day} ${month} ${year} at ${hours}:${minutes}`;
+                              const day = date.getDate();
+                              const month = date.toLocaleDateString("en-GB", { month: "short" });
+                              const year = date.getFullYear();
+                              const hours = String(date.getHours()).padStart(2, "0");
+                              const minutes = String(date.getMinutes()).padStart(2, "0");
+                              return `— booked before ${day} ${month} ${year} at ${hours}:${minutes} deadline`;
                             })()
-                          : "15 Sept 2026 at 22:00"}
+                          : ""}
                       </div>
                     </div>
                   )}

@@ -4,13 +4,37 @@ import dbConnect from "../../../lib/mongodb";
 import Rsvp from "../../../models/Rsvp";
 import Settings from "../../../models/Settings";
 import { getConfig } from "../../../config";
+import { uploadReceiptFile } from "../../../lib/storage";
+
+const ALLOWED_RECEIPT_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/heic",
+  "image/heif",
+  "application/pdf",
+];
+const MAX_RECEIPT_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
 
 export async function POST(request) {
   try {
     await dbConnect();
     const config = getConfig();
 
-    const body = await request.json();
+    const formData = await request.formData();
+
+    const name = formData.get("name")?.toString().trim() || "";
+    const phone = formData.get("phone")?.toString().trim() || "";
+    const address = formData.get("address")?.toString().trim() || "";
+    const email = formData.get("email")?.toString().trim() || "";
+    const organization = formData.get("organization")?.toString() || "ahhc";
+    const notes = formData.get("notes")?.toString().trim() || "";
+    const paymentProofReference =
+      formData.get("paymentProofReference")?.toString().trim() || "";
+    const under5 = parseInt(formData.get("under5")) || 0;
+    const age5to12 = parseInt(formData.get("age5to12")) || 0;
+    const age12plus = parseInt(formData.get("age12plus")) || 0;
+    const receiptFile = formData.get("receipt");
 
     // Check RSVP deadline before accepting any submission
     const settings = await Settings.findOne();
@@ -29,7 +53,7 @@ export async function POST(request) {
     }
 
     // Validate required fields
-    if (!body.name || !body.phone) {
+    if (!name || !phone) {
       return NextResponse.json(
         { error: "Name and phone number are required" },
         { status: 400 },
@@ -37,8 +61,7 @@ export async function POST(request) {
     }
 
     // Check if at least one ticket is selected
-    const totalTickets =
-      (body.under5 || 0) + (body.age5to12 || 0) + (body.age12plus || 0);
+    const totalTickets = under5 + age5to12 + age12plus;
     if (totalTickets === 0) {
       return NextResponse.json(
         { error: "Please select at least one ticket" },
@@ -46,8 +69,34 @@ export async function POST(request) {
       );
     }
 
-    // IMPROVEMENT 1: Check for duplicate booking by phone number
-    const existingBooking = await Rsvp.findOne({ phone: body.phone });
+    // Require proof of payment: a reference and a receipt file
+    if (!paymentProofReference) {
+      return NextResponse.json(
+        { error: "Please enter your payment reference" },
+        { status: 400 },
+      );
+    }
+    if (!receiptFile || typeof receiptFile === "string" || receiptFile.size === 0) {
+      return NextResponse.json(
+        { error: "Please upload a screenshot or PDF of your payment receipt" },
+        { status: 400 },
+      );
+    }
+    if (!ALLOWED_RECEIPT_TYPES.includes(receiptFile.type)) {
+      return NextResponse.json(
+        { error: "Receipt must be an image (JPG/PNG/WEBP/HEIC) or a PDF" },
+        { status: 400 },
+      );
+    }
+    if (receiptFile.size > MAX_RECEIPT_SIZE_BYTES) {
+      return NextResponse.json(
+        { error: "Receipt file is too large (max 5MB)" },
+        { status: 400 },
+      );
+    }
+
+    // Check for duplicate booking by phone number
+    const existingBooking = await Rsvp.findOne({ phone });
     if (existingBooking) {
       return NextResponse.json(
         { error: "A booking already exists with this phone number. Please contact the organiser if you need to make changes." },
@@ -56,7 +105,7 @@ export async function POST(request) {
     }
 
     // Get correct config based on organization selected by user
-    const orgId = body.organization || "ahhc";
+    const orgId = organization || "ahhc";
     let orgConfig;
     if (orgId === "ahhc") {
       const { ahhcConfig } = require("../../../config/organizations/ahhc.config");
@@ -75,25 +124,36 @@ export async function POST(request) {
     const childTier = orgConfig.pricing.tiers.find((t) => t.id === "child");
     const adultTier = orgConfig.pricing.tiers.find((t) => t.id === "adult");
     const totalAmount =
-      (body.age5to12 || 0) * childTier.price +
-      (body.age12plus || 0) * adultTier.price;
+      age5to12 * childTier.price + age12plus * adultTier.price;
 
-    // IMPROVEMENT 2: Generate human-readable booking reference
+    // Generate human-readable booking reference
     const bookingRef = `AKD-${orgId.toUpperCase()}-${Date.now().toString().slice(-6)}`;
 
-    // Create new RSVP with organization field
+    // Upload the receipt to Backblaze before creating the RSVP, so we never
+    // save a booking that claims to have a receipt but doesn't
+    const receiptBuffer = Buffer.from(await receiptFile.arrayBuffer());
+    const receiptFileKey = await uploadReceiptFile(
+      receiptBuffer,
+      receiptFile.name,
+      receiptFile.type,
+    );
+
+    // Create new RSVP with organization field and payment evidence
     const rsvp = await Rsvp.create({
       organization: orgId,
-      name: body.name,
-      phone: body.phone,
-      address: body.address || "",
-      email: body.email || "",
-      under5: body.under5 || 0,
-      age5to12: body.age5to12 || 0,
-      age12plus: body.age12plus || 0,
-      totalAmount: totalAmount,
+      name,
+      phone,
+      address,
+      email,
+      under5,
+      age5to12,
+      age12plus,
+      totalAmount,
       paymentReference: bookingRef,
-      notes: body.notes || "",
+      paymentProofReference,
+      receiptFileKey,
+      receiptUploadedAt: new Date(),
+      notes,
     });
 
     return NextResponse.json(
