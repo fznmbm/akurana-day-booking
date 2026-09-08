@@ -1008,124 +1008,6 @@ const [selectedOrg, setSelectedOrg] = useState(null);
                   </p>
                 ))}
               </div>
-
-              {/* Proof of Payment - Required */}
-              <div
-                style={{
-                  marginTop: "20px",
-                  paddingTop: "16px",
-                  borderTop: "1px solid #374151",
-                }}
-              >
-                <p
-                  style={{
-                    color: "#fbbf24",
-                    fontSize: "0.85rem",
-                    fontWeight: "600",
-                    marginBottom: "12px",
-                  }}
-                >
-                  ⚠️ After transferring the payment above, please provide proof
-                  below. Your booking cannot be submitted without it.
-                </p>
-
-                <label
-                  style={{
-                    display: "block",
-                    color: "#f3f4f6",
-                    marginBottom: "8px",
-                    fontSize: "0.875rem",
-                    fontWeight: "500",
-                  }}
-                >
-                  Your Payment Reference *
-                </label>
-                <input
-                  type="text"
-                  name="paymentProofReference"
-                  value={formData.paymentProofReference}
-                  onChange={handleChange}
-                  required
-                  placeholder="e.g. the reference/name used in the bank transfer"
-                  style={{
-                    width: "100%",
-                    padding: "12px",
-                    background: "#111827",
-                    border: "1px solid #374151",
-                    borderRadius: "6px",
-                    color: "#f3f4f6",
-                    fontSize: "0.9rem",
-                    outline: "none",
-                    boxSizing: "border-box",
-                    marginBottom: "16px",
-                  }}
-                />
-
-                <label
-                  style={{
-                    display: "block",
-                    color: "#f3f4f6",
-                    marginBottom: "8px",
-                    fontSize: "0.875rem",
-                    fontWeight: "500",
-                  }}
-                >
-                  Upload Payment Receipt *
-                </label>
-                <input
-                  type="file"
-                  name="receipt"
-                  accept="image/*,.pdf"
-                  onChange={handleReceiptChange}
-                  required
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    background: "#111827",
-                    border: "1px solid #374151",
-                    borderRadius: "6px",
-                    color: "#f3f4f6",
-                    fontSize: "0.85rem",
-                    outline: "none",
-                    boxSizing: "border-box",
-                  }}
-                />
-                {receiptFile && (
-                  <p
-                    style={{
-                      color: "#10b981",
-                      fontSize: "0.8rem",
-                      marginTop: "6px",
-                      marginBottom: 0,
-                    }}
-                  >
-                    ✓ {receiptFile.name}
-                  </p>
-                )}
-                {receiptError && (
-                  <p
-                    style={{
-                      color: "#ef4444",
-                      fontSize: "0.8rem",
-                      marginTop: "6px",
-                      marginBottom: 0,
-                    }}
-                  >
-                    {receiptError}
-                  </p>
-                )}
-                <p
-                  style={{
-                    color: "#6b7280",
-                    fontSize: "0.75rem",
-                    marginTop: "8px",
-                    marginBottom: 0,
-                  }}
-                >
-                  Screenshot or PDF of your bank transfer confirmation (max
-                  5MB).
-                </p>
-              </div>
             </div>
 
             {/* Form */}
@@ -1499,6 +1381,138 @@ const [selectedOrg, setSelectedOrg] = useState(null);
                   </div>
                 </div>
               )}
+
+              {/* Proof of Payment - Required */}
+              <div
+                style={{
+                  background: "#111827",
+                  border: "1px solid #374151",
+                  borderRadius: "8px",
+                  padding: "20px",
+                  marginBottom: "20px",
+                }}
+              >
+                <h3
+                  style={{
+                    color: "#f3f4f6",
+                    fontSize: "1rem",
+                    marginTop: 0,
+                    marginBottom: "12px",
+                    fontWeight: "600",
+                  }}
+                >
+                  🧾 Proof of Payment
+                </h3>
+                <p
+                  style={{
+                    color: "#fbbf24",
+                    fontSize: "0.85rem",
+                    fontWeight: "600",
+                    marginBottom: "16px",
+                  }}
+                >
+                  ⚠️ Please transfer the amount above using the bank details
+                  shown earlier, then enter your reference and upload proof
+                  below. Your booking cannot be submitted without it.
+                </p>
+
+                <label
+                  style={{
+                    display: "block",
+                    color: "#f3f4f6",
+                    marginBottom: "8px",
+                    fontSize: "0.875rem",
+                    fontWeight: "500",
+                  }}
+                >
+                  Your Payment Reference *
+                </label>
+                <input
+                  type="text"
+                  name="paymentProofReference"
+                  value={formData.paymentProofReference}
+                  onChange={handleChange}
+                  required
+                  placeholder="e.g. the reference/name used in the bank transfer"
+                  style={{
+                    width: "100%",
+                    padding: "12px",
+                    background: "#1f2937",
+                    border: "1px solid #374151",
+                    borderRadius: "6px",
+                    color: "#f3f4f6",
+                    fontSize: "0.9rem",
+                    outline: "none",
+                    boxSizing: "border-box",
+                    marginBottom: "16px",
+                  }}
+                />
+
+                <label
+                  style={{
+                    display: "block",
+                    color: "#f3f4f6",
+                    marginBottom: "8px",
+                    fontSize: "0.875rem",
+                    fontWeight: "500",
+                  }}
+                >
+                  Upload Payment Receipt *
+                </label>
+                <input
+                  type="file"
+                  name="receipt"
+                  accept="image/*,.pdf"
+                  onChange={handleReceiptChange}
+                  required
+                  style={{
+                    width: "100%",
+                    padding: "10px",
+                    background: "#1f2937",
+                    border: "1px solid #374151",
+                    borderRadius: "6px",
+                    color: "#f3f4f6",
+                    fontSize: "0.85rem",
+                    outline: "none",
+                    boxSizing: "border-box",
+                  }}
+                />
+                {receiptFile && (
+                  <p
+                    style={{
+                      color: "#10b981",
+                      fontSize: "0.8rem",
+                      marginTop: "6px",
+                      marginBottom: 0,
+                    }}
+                  >
+                    ✓ {receiptFile.name}
+                  </p>
+                )}
+                {receiptError && (
+                  <p
+                    style={{
+                      color: "#ef4444",
+                      fontSize: "0.8rem",
+                      marginTop: "6px",
+                      marginBottom: 0,
+                    }}
+                  >
+                    {receiptError}
+                  </p>
+                )}
+                <p
+                  style={{
+                    color: "#6b7280",
+                    fontSize: "0.75rem",
+                    marginTop: "8px",
+                    marginBottom: 0,
+                  }}
+                >
+                  Screenshot or PDF of your bank transfer confirmation (max
+                  5MB).
+                </p>
+              </div>
 
               {/* Payment Reference */}
               {/* <div style={{ marginBottom: "20px" }}>
