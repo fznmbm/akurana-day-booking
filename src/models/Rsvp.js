@@ -63,7 +63,7 @@ const RsvpSchema = new mongoose.Schema({
   },
   receiptUploadedAt: {
     type: Date,
-  },2301
+  },
   bookingRef: {
     type: String,
     trim: true,
