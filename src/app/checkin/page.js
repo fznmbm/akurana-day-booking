@@ -1061,8 +1061,7 @@ export default function CheckInScanner() {
                             fontSize: "0.75rem",
                           }}
                         >
-                          {person.under5 + person.age5to12 + person.age12plus}{" "}
-                          people • {timeText}
+                          {person.totalGuests} people • {timeText}
                         </div>
                       </div>
 
