@@ -18,6 +18,7 @@ export default function CheckInScanner() {
   const [audioContext, setAudioContext] = useState(null);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [volunteerStats, setVolunteerStats] = useState({ today: 0, total: 0 });
+  const [lastUpdated, setLastUpdated] = useState(null);
 
   const router = useRouter();
 
@@ -131,17 +132,14 @@ export default function CheckInScanner() {
 
     const soundPref = localStorage.getItem("soundEnabled");
     if (soundPref !== null) setSoundEnabled(soundPref === "true");
+  }, []);
 
-    // Load volunteer stats
-    const savedStats = JSON.parse(
-      localStorage.getItem("volunteerStats") || '{"today": 0, "total": 0}',
-    );
-    setVolunteerStats(savedStats);
-
+  useEffect(() => {
+    if (showNameGate) return; // don't poll until we know who's scanning
     fetchStats();
     const interval = setInterval(fetchStats, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [showNameGate, volunteerName]);
 
   // QR SCANNER MANAGEMENT
   useEffect(() => {
@@ -200,30 +198,34 @@ export default function CheckInScanner() {
 
   const fetchStats = async () => {
     try {
-      const token = localStorage.getItem("adminToken");
-      const response = await fetch("/api/admin/rsvps", {
-        headers: { Authorization: `Bearer ${token}` },
+      // Real local midnight-to-midnight boundaries, computed here (not on
+      // the server) so "today" always matches the volunteer's own device
+      // clock rather than guessing a server timezone.
+      const now = new Date();
+      const todayStart = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+      ).toISOString();
+      const todayEnd = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() + 1,
+      ).toISOString();
+
+      const params = new URLSearchParams({
+        volunteerName: volunteerName || "",
+        todayStart,
+        todayEnd,
       });
+
+      const response = await fetch(`/api/checkin/stats?${params}`);
       const data = await response.json();
 
       if (response.ok) {
-        const checkedInList = data.data
-          .filter((r) => r.checkedIn)
-          .sort((a, b) => new Date(b.checkInTime) - new Date(a.checkInTime))
-          .slice(0, 10);
-
-        setRecentCheckIns(checkedInList);
-
-        const checkedInCount = data.data.filter((r) => r.checkedIn).length;
-        const paidCount = data.data.filter(
-          (r) => r.paymentStatus === "paid",
-        ).length;
-        setStats({
-          checkedIn: checkedInCount,
-          total: paidCount,
-          percentage:
-            paidCount > 0 ? Math.round((checkedInCount / paidCount) * 100) : 0,
-        });
+        setStats(data.event);
+        setVolunteerStats(data.volunteer);
+        setLastUpdated(new Date());
       }
     } catch (error) {
       console.error("Failed to fetch stats:", error);
@@ -254,14 +256,6 @@ export default function CheckInScanner() {
       const data = await response.json();
 
       if (data.success) {
-        // Update volunteer stats
-        const newStats = {
-          today: volunteerStats.today + 1,
-          total: volunteerStats.total + 1,
-        };
-        setVolunteerStats(newStats);
-        localStorage.setItem("volunteerStats", JSON.stringify(newStats));
-
         playSuccessSound();
         setResult({
           type: "success",
@@ -270,6 +264,7 @@ export default function CheckInScanner() {
         });
         setManualCode("");
         fetchStats();
+        setRecentCheckIns((prev) => [data.data, ...prev].slice(0, 10));
 
         setTimeout(() => {
           setResult(null);
@@ -603,6 +598,24 @@ export default function CheckInScanner() {
             </div>
           </div>
         </div>
+
+        {lastUpdated && (
+          <div
+            style={{
+              fontSize: "0.7rem",
+              color: "#6b7280",
+              textAlign: "center",
+              marginBottom: "16px",
+            }}
+          >
+            Last updated:{" "}
+            {lastUpdated.toLocaleTimeString("en-GB", {
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            })}
+          </div>
+        )}
 
         {/* QR SCANNER */}
         <div

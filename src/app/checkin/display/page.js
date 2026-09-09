@@ -11,6 +11,7 @@ export default function CheckInDisplay() {
   const [showCelebration, setShowCelebration] = useState(false);
   const [lastMilestone, setLastMilestone] = useState(0);
   const [authError, setAuthError] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(null);
 
   // Update time every second
   useEffect(() => {
@@ -68,9 +69,13 @@ export default function CheckInDisplay() {
           total: paidCount,
           percentage,
         });
+        setLastUpdated(new Date());
       }
     } catch (error) {
       console.error("Failed to fetch stats:", error);
+      // Deliberately don't touch lastUpdated here — a failed poll should
+      // make the on-screen "Last updated" time fall behind, which is
+      // exactly the visible signal that something's wrong.
     }
   };
 
@@ -117,6 +122,11 @@ export default function CheckInDisplay() {
       </div>
     );
   }
+
+  const secondsSinceUpdate = lastUpdated
+    ? Math.floor((currentTime - lastUpdated) / 1000)
+    : null;
+  const isStale = secondsSinceUpdate !== null && secondsSinceUpdate > 15; // normal poll is every 5s
 
   if (!stats) {
     return (
@@ -256,17 +266,49 @@ export default function CheckInDisplay() {
               marginBottom: "16px",
             }}
           >
-            {/* Logo */}
-            <img
-              src="/logo.png"
-              alt="AHHC Logo"
-              style={{
-                width: "60px",
-                height: "60px",
-                objectFit: "contain",
-                filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.3))",
-              }}
-            />
+            {/* Logos - all three organisations, since check-ins from any
+                of them appear together on this shared display */}
+            <div style={{ display: "flex", gap: "8px" }}>
+              <img
+                src="/logos/ahhc-logo.png"
+                alt="AHHC"
+                style={{
+                  width: "48px",
+                  height: "48px",
+                  objectFit: "contain",
+                  borderRadius: "50%",
+                  background: "white",
+                  padding: "3px",
+                  filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.3))",
+                }}
+              />
+              <img
+                src="/logos/auf-logo.png"
+                alt="AUF"
+                style={{
+                  width: "48px",
+                  height: "48px",
+                  objectFit: "contain",
+                  borderRadius: "50%",
+                  background: "white",
+                  padding: "3px",
+                  filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.3))",
+                }}
+              />
+              <img
+                src="/logos/awauk-logo.png"
+                alt="AWA-UK"
+                style={{
+                  width: "48px",
+                  height: "48px",
+                  objectFit: "contain",
+                  borderRadius: "50%",
+                  background: "white",
+                  padding: "3px",
+                  filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.3))",
+                }}
+              />
+            </div>
 
             {/* Subtitle Box */}
             <div>
@@ -486,6 +528,42 @@ export default function CheckInDisplay() {
               Updates every 5 seconds
             </div>
           </div>
+
+          {lastUpdated && (
+            <div
+              style={{
+                marginTop: "16px",
+                padding: "12px",
+                borderRadius: "12px",
+                textAlign: "center",
+                background: isStale
+                  ? "rgba(239, 68, 68, 0.15)"
+                  : "rgba(107, 114, 128, 0.15)",
+                border: `1px solid ${isStale ? "#ef4444" : "#374151"}`,
+              }}
+            >
+              {isStale && (
+                <div
+                  style={{
+                    color: "#fca5a5",
+                    fontWeight: "700",
+                    fontSize: "0.9rem",
+                    marginBottom: "4px",
+                  }}
+                >
+                  ⚠️ Data may be out of date
+                </div>
+              )}
+              <div style={{ color: "#9ca3af", fontSize: "0.85rem" }}>
+                Last updated:{" "}
+                {lastUpdated.toLocaleTimeString("en-GB", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Right Column - Live Feed */}
