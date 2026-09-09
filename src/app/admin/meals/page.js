@@ -1484,11 +1484,11 @@ ${config.organization.name} Team`;
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.backgroundColor =
-                          rsvp.dietaryRestrictions ? "#991b1b" : "#374151";
+                          rsvp.dietaryRestrictions ? "#7a3f3f" : "#374151";
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor =
-                          rsvp.dietaryRestrictions ? "#7f1d1d" : "transparent";
+                          rsvp.dietaryRestrictions ? "#6f4040" : "transparent";
                       }}
                     >
                       <td style={{ padding: "16px" }}>
@@ -1513,7 +1513,6 @@ ${config.organization.name} Team`;
                                 fontSize: "0.7rem",
                                 fontWeight: "700",
                               }}
-                              title={rsvp.dietaryRestrictions}
                             >
                               ⚠️ ALLERGY
                             </span>
@@ -1522,6 +1521,20 @@ ${config.organization.name} Team`;
                         <div style={{ fontSize: "0.875rem", color: "#9ca3af" }}>
                           {rsvp.phone}
                         </div>
+                        {rsvp.dietaryRestrictions && (
+                          <div
+                            style={{
+                              fontSize: "0.75rem",
+                              color: "#fca5a5",
+                              fontWeight: "600",
+                              marginTop: "4px",
+                              maxWidth: "260px",
+                              lineHeight: "1.4",
+                            }}
+                          >
+                            {rsvp.dietaryRestrictions}
+                          </div>
+                        )}
                         {rsvp.organization && (
                           <div style={{
                             marginTop: "4px",
@@ -1708,6 +1721,40 @@ ${config.organization.name} Team`;
                     color: rsvp.organization === "ahhc" ? "#667eea" : rsvp.organization === "auf" ? "#10b981" : "#f59e0b",
                   }}>
                     {rsvp.organization === "ahhc" ? "AHHC" : rsvp.organization === "auf" ? "AUF" : "AWA-UK"}
+                  </div>
+                )}
+
+                {rsvp.dietaryRestrictions && (
+                  <div
+                    style={{
+                      marginBottom: "12px",
+                      padding: "8px 10px",
+                      background: "rgba(239, 68, 68, 0.15)",
+                      border: "1px solid #ef4444",
+                      borderRadius: "6px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "0.7rem",
+                        color: "#fca5a5",
+                        fontWeight: "700",
+                        marginBottom: "2px",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.5px",
+                      }}
+                    >
+                      ⚠️ Allergy / Dietary Note
+                    </div>
+                    <div
+                      style={{
+                        fontSize: "0.8rem",
+                        color: "#fecaca",
+                        lineHeight: "1.4",
+                      }}
+                    >
+                      {rsvp.dietaryRestrictions}
+                    </div>
                   </div>
                 )}
 

@@ -1549,7 +1549,7 @@ const [selectedOrg, setSelectedOrg] = useState(null);
               </div> */}
 
               {/* Additional Notes */}
-              <div style={{ marginBottom: "24px" }}>
+              {/* <div style={{ marginBottom: "24px" }}>
                 <label
                   style={{
                     display: "block",
@@ -1581,7 +1581,7 @@ const [selectedOrg, setSelectedOrg] = useState(null);
                     boxSizing: "border-box",
                   }}
                 />
-              </div>
+              </div> */}
 
               {/* Submit Button */}
               <button
