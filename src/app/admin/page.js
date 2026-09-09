@@ -325,6 +325,63 @@ export default function AdminDashboard() {
     link.click();
   };
 
+  const sendQrCode = async (rsvp) => {
+    try {
+      const qrDataUrl = await QRCode.toDataURL(rsvp.checkInCode, {
+        width: 200,
+        margin: 1,
+        color: { dark: "#000000", light: "#FFFFFF" },
+      });
+      const res = await fetch(qrDataUrl);
+      const blob = await res.blob();
+      const file = new File([blob], `QR-${rsvp.name}.png`, {
+        type: "image/png",
+      });
+
+      if (
+        navigator.share &&
+        navigator.canShare &&
+        navigator.canShare({ files: [file] })
+      ) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: `QR Code for ${rsvp.name}`,
+            text: `Check-in QR code for ${rsvp.name}\n${config.event.fullName}`,
+          });
+          return;
+        } catch (err) {
+          if (err?.name === "AbortError") return; // admin cancelled the share sheet
+          // otherwise fall through to the manual fallback below
+        }
+      }
+
+      // This browser can't attach the image directly (common on desktop
+      // browsers). Download it so it's ready to attach manually, and be
+      // upfront with the admin about what just happened instead of
+      // silently sending a text-only message.
+      const link = document.createElement("a");
+      link.download = `QR-${rsvp.name}.png`;
+      link.href = qrDataUrl;
+      link.click();
+
+      setMessage({
+        type: "success",
+        text: "This browser can't send the QR image directly — it's been downloaded. Please attach it manually in the WhatsApp chat that opens.",
+      });
+      setTimeout(() => setMessage({ type: "", text: "" }), 6000);
+
+      const message = encodeURIComponent(
+        `Check-in QR code for ${rsvp.name}\n${config.event.fullName}\nCode: ${rsvp.checkInCode}\n\n(QR image attached separately)`,
+      );
+      window.open(`https://wa.me/?text=${message}`, "_blank");
+    } catch (error) {
+      console.error("Send QR error:", error);
+      setMessage({ type: "error", text: "Failed to prepare QR code" });
+      setTimeout(() => setMessage({ type: "", text: "" }), 3000);
+    }
+  };
+
   const viewReceipt = async (rsvpId) => {
     try {
       const token = localStorage.getItem("adminToken");
@@ -2391,53 +2448,7 @@ const copyForWhatsApp = () => {
 
                               {/* WhatsApp Send Button */}
                               <button
-                                onClick={() => {
-                                  // Generate QR on-demand for sharing
-                                  QRCode.toDataURL(rsvp.checkInCode, {
-                                    width: 200,
-                                    margin: 1,
-                                    color: {
-                                      dark: "#000000",
-                                      light: "#FFFFFF",
-                                    },
-                                  }).then((qrDataUrl) => {
-                                    fetch(qrDataUrl)
-                                      .then((res) => res.blob())
-                                      .then((blob) => {
-                                        const file = new File(
-                                          [blob],
-                                          `QR-${rsvp.name}.png`,
-                                          { type: "image/png" },
-                                        );
-
-                                        // Check if Web Share API is available
-                                        if (
-                                          navigator.share &&
-                                          navigator.canShare &&
-                                          navigator.canShare({ files: [file] })
-                                        ) {
-                                          navigator
-                                            .share({
-                                              files: [file],
-                                              title: `QR Code for ${rsvp.name}`,
-                                              text: `Check-in QR code for ${rsvp.name}\n${config.event.fullName}`,
-                                            })
-                                            .catch((err) =>
-                                              console.log("Share cancelled"),
-                                            );
-                                        } else {
-                                          // Fallback: Open WhatsApp Web
-                                          const message = encodeURIComponent(
-                                            `Check-in QR code for ${rsvp.name}\n${config.event.fullName}\nCode:${rsvp.checkInCode}`, // ✅ CORRECT
-                                          );
-                                          window.open(
-                                            `https://wa.me/?text=${message}`,
-                                            "_blank",
-                                          );
-                                        }
-                                      });
-                                  });
-                                }}
+                                onClick={() => sendQrCode(rsvp)}
                                 style={{
                                   marginTop: "6px",
                                   padding: "6px 10px",
@@ -3006,58 +3017,7 @@ const copyForWhatsApp = () => {
                       >
                         {/* WhatsApp Send Button */}
                         <button
-                          onClick={() => {
-                            QRCode.toDataURL(rsvp.checkInCode, {
-                              width: 200,
-                              margin: 1,
-                              color: { dark: "#000000", light: "#FFFFFF" },
-                            }).then((qrDataUrl) => {
-                              fetch(qrDataUrl)
-                                .then((res) => res.blob())
-                                .then((blob) => {
-                                  const file = new File(
-                                    [blob],
-                                    `QR-${rsvp.name}.png`,
-                                    { type: "image/png" },
-                                  );
-                                  if (
-                                    navigator.share &&
-                                    navigator.canShare &&
-                                    navigator.canShare({ files: [file] })
-                                  ) {
-                                    navigator
-                                      .share({
-                                        files: [file],
-                                        title: `QR Code - ${rsvp.name}`,
-                                        text: `Check-in QR code for ${rsvp.name}\n${config.event.fullName}`,
-                                      })
-                                      .catch((err) =>
-                                        console.log("Share cancelled"),
-                                      );
-                                  } else {
-                                    const message = encodeURIComponent(
-                                      `✅ QR Code: ${rsvp.name}\nCode: ${
-                                        rsvp.checkInCode
-                                      }\nGuests: ${
-                                        rsvp.under5 +
-                                        rsvp.age5to12 +
-                                        rsvp.age12plus
-                                      }\n${config.event.fullName}`,
-                                    );
-                                    const isMobile =
-                                      /iPhone|iPad|iPod|Android/i.test(
-                                        navigator.userAgent,
-                                      );
-                                    window.open(
-                                      isMobile
-                                        ? `whatsapp://send?text=${message}`
-                                        : `https://wa.me/?text=${message}`,
-                                      "_blank",
-                                    );
-                                  }
-                                });
-                            });
-                          }}
+                          onClick={() => sendQrCode(rsvp)}
                           style={{
                             padding: "10px 16px",
                             background: "#10b981",
