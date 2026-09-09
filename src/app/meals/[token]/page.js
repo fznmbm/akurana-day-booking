@@ -356,7 +356,7 @@ export default function MealSelectionPage() {
             </div>
 
             <p style={{ color: "#9ca3af", fontSize: "0.875rem" }}>
-              See you on 17th January 2026! 🎉
+              See you on 26th September 2026! 🎉
             </p>
           </div>
         </div>
@@ -498,7 +498,7 @@ export default function MealSelectionPage() {
             </div>
 
             <p style={{ color: "#9ca3af", fontSize: "0.875rem" }}>
-              See you on 17th January 2026! 🎉
+              See you on 26th September 2026! 🎉
             </p>
           </div>
         </div>
