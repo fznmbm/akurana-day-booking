@@ -11,7 +11,8 @@ export default function CheckInScanner() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [stats, setStats] = useState(null);
-  const [scannerActive, setScannerActive] = useState(true);
+  const [scannerActive, setScannerActive] = useState(false);
+  const [showNameGate, setShowNameGate] = useState(true);
   const [lastScannedCode, setLastScannedCode] = useState("");
   const [recentCheckIns, setRecentCheckIns] = useState([]);
   const [audioContext, setAudioContext] = useState(null);
@@ -122,7 +123,11 @@ export default function CheckInScanner() {
 
   useEffect(() => {
     const saved = localStorage.getItem("volunteerName");
-    if (saved) setVolunteerName(saved);
+    if (saved) {
+      setVolunteerName(saved);
+      setShowNameGate(false);
+      setScannerActive(true);
+    }
 
     const soundPref = localStorage.getItem("soundEnabled");
     if (soundPref !== null) setSoundEnabled(soundPref === "true");
@@ -325,6 +330,14 @@ export default function CheckInScanner() {
     }
   };
 
+  const handleStartScanning = (e) => {
+    e.preventDefault();
+    if (!volunteerName.trim()) return;
+    localStorage.setItem("volunteerName", volunteerName.trim());
+    setShowNameGate(false);
+    setScannerActive(true);
+  };
+
   const handleManualSubmit = (e) => {
     e.preventDefault();
     if (!manualCode.trim()) {
@@ -355,6 +368,97 @@ export default function CheckInScanner() {
       osc.stop(audioContext.currentTime + 0.1);
     }
   };
+
+    if (showNameGate) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "#111827",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "20px",
+          fontFamily: "system-ui, -apple-system, sans-serif",
+        }}
+      >
+        <div
+          style={{
+            background: "#1f2937",
+            borderRadius: "16px",
+            padding: "32px 24px",
+            maxWidth: "400px",
+            width: "100%",
+            border: "2px solid #10b981",
+            textAlign: "center",
+          }}
+        >
+          <div style={{ fontSize: "3rem", marginBottom: "16px" }}>👋</div>
+          <h1
+            style={{
+              fontSize: "1.5rem",
+              fontWeight: "700",
+              color: "#f9fafb",
+              marginBottom: "8px",
+            }}
+          >
+            Welcome, Volunteer!
+          </h1>
+          <p
+            style={{
+              color: "#9ca3af",
+              fontSize: "0.9rem",
+              marginBottom: "24px",
+              lineHeight: "1.5",
+            }}
+          >
+            Enter your name so check-ins can be tracked back to you. You'll
+            only need to do this once on this device.
+          </p>
+          <form onSubmit={handleStartScanning}>
+            <input
+              type="text"
+              value={volunteerName}
+              onChange={(e) => setVolunteerName(e.target.value)}
+              placeholder="Your name"
+              autoFocus
+              required
+              style={{
+                width: "100%",
+                padding: "14px",
+                background: "#111827",
+                border: "1px solid #374151",
+                borderRadius: "8px",
+                color: "#f3f4f6",
+                fontSize: "1rem",
+                outline: "none",
+                boxSizing: "border-box",
+                marginBottom: "16px",
+                textAlign: "center",
+              }}
+            />
+            <button
+              type="submit"
+              disabled={!volunteerName.trim()}
+              style={{
+                width: "100%",
+                padding: "14px",
+                background: volunteerName.trim() ? "#10b981" : "#4b5563",
+                color: "white",
+                border: "none",
+                borderRadius: "8px",
+                fontSize: "1rem",
+                fontWeight: "700",
+                cursor: volunteerName.trim() ? "pointer" : "not-allowed",
+              }}
+            >
+              Start Scanning →
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -616,7 +720,7 @@ export default function CheckInScanner() {
             border: "1px solid #374151",
           }}
         >
-          <summary
+                    <summary
             style={{
               color: "#9ca3af",
               fontSize: "0.875rem",
@@ -625,7 +729,7 @@ export default function CheckInScanner() {
               userSelect: "none",
             }}
           >
-            👤 Set Your Name (optional)
+            👤 Scanning as: {volunteerName || "Volunteer"} (tap to change)
           </summary>
 
           <div style={{ marginTop: "12px" }}>
@@ -971,45 +1075,6 @@ export default function CheckInScanner() {
           </div>
         )}
 
-        {/* Navigation */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "12px",
-          }}
-        >
-          <button
-            onClick={() => router.push("/admin")}
-            style={{
-              padding: "12px",
-              background: "#374151",
-              color: "#f3f4f6",
-              border: "none",
-              borderRadius: "8px",
-              fontWeight: "600",
-              cursor: "pointer",
-              fontSize: "0.875rem",
-            }}
-          >
-            ← Admin
-          </button>
-          <button
-            onClick={() => window.open("/checkin/display", "_blank")}
-            style={{
-              padding: "12px",
-              background: "#7c3aed",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              fontWeight: "600",
-              cursor: "pointer",
-              fontSize: "0.875rem",
-            }}
-          >
-            📺 Display
-          </button>
-        </div>
       </div>
 
       {/* CSS Animations */}

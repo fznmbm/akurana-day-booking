@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import dbConnect from "../../../lib/mongodb";
 import Rsvp from "../../../models/Rsvp";
+import { verifyAdminAuth } from "../../../lib/auth";
 
 // GET - Get RSVP info by check-in code
 export async function GET(request) {
@@ -130,8 +131,7 @@ export async function POST(request) {
 // PUT - Undo check-in (admin only, with auth)
 export async function PUT(request) {
   try {
-    const authHeader = request.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if (!verifyAdminAuth(request)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

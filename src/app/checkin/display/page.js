@@ -10,6 +10,7 @@ export default function CheckInDisplay() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showCelebration, setShowCelebration] = useState(false);
   const [lastMilestone, setLastMilestone] = useState(0);
+  const [authError, setAuthError] = useState(false);
 
   // Update time every second
   useEffect(() => {
@@ -27,12 +28,18 @@ export default function CheckInDisplay() {
   const fetchData = async () => {
     try {
       const token = localStorage.getItem("adminToken");
-      const response = await fetch("/api/admin/rsvps", {
+           const response = await fetch("/api/admin/rsvps", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
 
+      if (response.status === 401) {
+        setAuthError(true);
+        return;
+      }
+
       if (response.ok) {
+        setAuthError(false);
         const checkedInList = data.data
           .filter((r) => r.checkedIn)
           .sort((a, b) => new Date(b.checkInTime) - new Date(a.checkInTime))
@@ -66,6 +73,50 @@ export default function CheckInDisplay() {
       console.error("Failed to fetch stats:", error);
     }
   };
+
+  if (authError) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "#0a0e1a",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "40px",
+          textAlign: "center",
+        }}
+      >
+        <div>
+          <div style={{ fontSize: "3rem", marginBottom: "16px" }}>🔒</div>
+          <h2
+            style={{
+              color: "#f9fafb",
+              fontSize: "1.5rem",
+              marginBottom: "12px",
+            }}
+          >
+            Not Logged In
+          </h2>
+          <p
+            style={{
+              color: "#9ca3af",
+              fontSize: "1rem",
+              maxWidth: "400px",
+              margin: "0 auto",
+              lineHeight: "1.6",
+            }}
+          >
+            This display needs an active admin login on this device. Open{" "}
+            <a href="/admin/login" style={{ color: "#667eea" }}>
+              /admin/login
+            </a>{" "}
+            in this browser, log in, then reload this page.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (!stats) {
     return (
