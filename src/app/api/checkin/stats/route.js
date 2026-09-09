@@ -18,7 +18,7 @@ export async function GET(request) {
 
     const allRsvps = await Rsvp.find(
       {},
-      "checkedIn checkInTime checkInBy paymentStatus",
+      "name under5 age5to12 age12plus checkedIn checkInTime checkInBy paymentStatus",
     );
 
     const checkedInCount = allRsvps.filter((r) => r.checkedIn).length;
@@ -30,18 +30,21 @@ export async function GET(request) {
 
     let volunteerToday = 0;
     let volunteerTotal = 0;
+    let volunteerRecent = [];
 
     if (volunteerName) {
       const nameLower = volunteerName.toLowerCase();
       const start = todayStart ? new Date(todayStart) : null;
       const end = todayEnd ? new Date(todayEnd) : null;
 
-      const byThisVolunteer = allRsvps.filter(
-        (r) =>
-          r.checkedIn &&
-          r.checkInBy &&
-          r.checkInBy.trim().toLowerCase() === nameLower,
-      );
+      const byThisVolunteer = allRsvps
+        .filter(
+          (r) =>
+            r.checkedIn &&
+            r.checkInBy &&
+            r.checkInBy.trim().toLowerCase() === nameLower,
+        )
+        .sort((a, b) => new Date(b.checkInTime) - new Date(a.checkInTime));
 
       volunteerTotal = byThisVolunteer.length;
       volunteerToday =
@@ -51,6 +54,14 @@ export async function GET(request) {
               return t >= start && t < end;
             }).length
           : volunteerTotal;
+
+      // Only this volunteer's own check-ins — never anyone else's —
+      // so a page refresh can restore what they'd already seen.
+      volunteerRecent = byThisVolunteer.slice(0, 10).map((r) => ({
+        name: r.name,
+        totalGuests: r.under5 + r.age5to12 + r.age12plus,
+        checkInTime: r.checkInTime,
+      }));
     }
 
     return NextResponse.json({
@@ -63,6 +74,7 @@ export async function GET(request) {
       volunteer: {
         today: volunteerToday,
         total: volunteerTotal,
+        recent: volunteerRecent,
       },
     });
   } catch (error) {

@@ -141,6 +141,20 @@ export default function CheckInScanner() {
     return () => clearInterval(interval);
   }, [showNameGate, volunteerName]);
 
+  // Resume the camera if the tab was backgrounded — mobile browsers often
+  // suspend the stream while hidden, leaving a frozen feed on return.
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible" && scannerActive) {
+        setScannerActive(false);
+        setTimeout(() => setScannerActive(true), 100);
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [scannerActive]);
+
   // QR SCANNER MANAGEMENT
   useEffect(() => {
     let html5QrCodeInstance = null;
@@ -225,6 +239,7 @@ export default function CheckInScanner() {
       if (response.ok) {
         setStats(data.event);
         setVolunteerStats(data.volunteer);
+        setRecentCheckIns(data.volunteer.recent || []);
         setLastUpdated(new Date());
       }
     } catch (error) {
@@ -264,7 +279,6 @@ export default function CheckInScanner() {
         });
         setManualCode("");
         fetchStats();
-        setRecentCheckIns((prev) => [data.data, ...prev].slice(0, 10));
 
         setTimeout(() => {
           setResult(null);

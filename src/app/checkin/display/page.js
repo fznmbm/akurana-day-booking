@@ -12,6 +12,8 @@ export default function CheckInDisplay() {
   const [lastMilestone, setLastMilestone] = useState(0);
   const [authError, setAuthError] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
+  const [latestSeenId, setLatestSeenId] = useState(null);
+  const [justArrivedId, setJustArrivedId] = useState(null);
 
   // Update time every second
   useEffect(() => {
@@ -45,6 +47,16 @@ export default function CheckInDisplay() {
           .filter((r) => r.checkedIn)
           .sort((a, b) => new Date(b.checkInTime) - new Date(a.checkInTime))
           .slice(0, 15);
+
+        const newTopId = checkedInList[0]?._id || null;
+        if (newTopId && newTopId !== latestSeenId) {
+          setJustArrivedId(newTopId);
+          setLatestSeenId(newTopId);
+          // Clear the "NEW" badge after a moment, same principle as the
+          // check-in scanner's own success feedback — it's a brief pulse
+          // of "this just happened," not a persistent state.
+          setTimeout(() => setJustArrivedId(null), 8000);
+        }
 
         setRecentCheckIns(checkedInList);
 
@@ -655,19 +667,21 @@ export default function CheckInDisplay() {
                       key={person._id}
                       style={{
                         background:
-                          index === 0
+                          person._id === justArrivedId
                             ? "linear-gradient(135deg, #064e3b 0%, #047857 100%)"
                             : "#111827",
                         borderRadius: "16px",
                         padding: "24px",
                         marginBottom: "16px",
                         border: `2px solid ${
-                          index === 0 ? "#10b981" : "#374151"
+                          person._id === justArrivedId ? "#10b981" : "#374151"
                         }`,
                         animation:
-                          index === 0 ? "slideInRight 0.5s ease-out" : "none",
+                          person._id === justArrivedId
+                            ? "slideInRight 0.5s ease-out"
+                            : "none",
                         boxShadow:
-                          index === 0
+                          person._id === justArrivedId
                             ? "0 8px 32px rgba(16, 185, 129, 0.4)"
                             : "none",
                       }}
@@ -713,7 +727,7 @@ export default function CheckInDisplay() {
                           </div>
                         </div>
 
-                        {index === 0 && (
+                        {person._id === justArrivedId && (
                           <div
                             style={{
                               background: "#10b981",

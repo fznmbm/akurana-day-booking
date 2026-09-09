@@ -61,6 +61,37 @@ export async function POST(request) {
 
     await dbConnect();
 
+    // Atomic: this only succeeds if the document is still un-checked-in and
+    // paid at the exact moment the database applies it. If two scans of the
+    // same code land within the same instant, only one can possibly match.
+    const updated = await Rsvp.findOneAndUpdate(
+      { checkInCode: code, checkedIn: false, paymentStatus: "paid" },
+      {
+        $set: {
+          checkedIn: true,
+          checkInTime: new Date(),
+          checkInBy: volunteerName || "Volunteer",
+        },
+      },
+      { new: true },
+    );
+
+    if (updated) {
+      return NextResponse.json({
+        success: true,
+        message: `✅ ${updated.name} checked in successfully!`,
+        data: {
+          name: updated.name,
+          totalGuests: updated.under5 + updated.age5to12 + updated.age12plus,
+          checkInTime: updated.checkInTime,
+          checkInBy: updated.checkInBy,
+        },
+      });
+    }
+
+    // The atomic update didn't match anything — look the record up
+    // separately purely to figure out why, for messaging only. No write
+    // happens here, so this can't reintroduce the race.
     const rsvp = await Rsvp.findOne({ checkInCode: code });
 
     if (!rsvp) {
@@ -70,7 +101,6 @@ export async function POST(request) {
       );
     }
 
-    // Check if already checked in
     if (rsvp.checkedIn) {
       return NextResponse.json({
         success: false,
@@ -86,7 +116,6 @@ export async function POST(request) {
       });
     }
 
-    // Check if payment is confirmed
     if (rsvp.paymentStatus !== "paid") {
       return NextResponse.json(
         {
@@ -102,23 +131,7 @@ export async function POST(request) {
       );
     }
 
-    // Process check-in
-    rsvp.checkedIn = true;
-    rsvp.checkInTime = new Date();
-    rsvp.checkInBy = volunteerName || "Volunteer";
-
-    await rsvp.save();
-
-    return NextResponse.json({
-      success: true,
-      message: `✅ ${rsvp.name} checked in successfully!`,
-      data: {
-        name: rsvp.name,
-        totalGuests: rsvp.under5 + rsvp.age5to12 + rsvp.age12plus,
-        checkInTime: rsvp.checkInTime,
-        checkInBy: rsvp.checkInBy,
-      },
-    });
+    return NextResponse.json({ error: "Check-in failed" }, { status: 500 });
   } catch (error) {
     console.error("Check-in error:", error);
     return NextResponse.json(
