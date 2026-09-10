@@ -446,7 +446,7 @@ export default function CheckInDisplay() {
           transition: "all 0.4s ease",
         }}
       >
-        <div style={{ fontSize: "3.5rem" }}>{justArrived ? "🎉" : "⏳"}</div>
+        <div style={{ fontSize: "3.5rem" }}>{justArrived ? "✅" : "⏳"}</div>
         <div>
           <div
             style={{
