@@ -13,9 +13,7 @@ export default function CheckInDisplay() {
   const [authError, setAuthError] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
   const latestSeenIdRef = useRef(null);
-  const [justArrived, setJustArrived] = useState(null);
-  const tickerRef = useRef(null);
-  const prevScrollHeightRef = useRef(0);
+  const [justArrivedId, setJustArrivedId] = useState(null);
 
   // Update time every second
   useEffect(() => {
@@ -29,48 +27,6 @@ export default function CheckInDisplay() {
     const interval = setInterval(fetchData, 5000);
     return () => clearInterval(interval);
   }, []);
-
-  // Continuous auto-scroll of the ticker — entirely decoupled from data
-  // fetching and from the spotlight panel. Runs once, forever, quietly
-  // looping through whatever the ticker currently contains.
-  useEffect(() => {
-    let rafId;
-    let paused = false;
-
-    const step = () => {
-      const el = tickerRef.current;
-      if (el && !paused) {
-        const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
-        if (atBottom && el.scrollHeight > el.clientHeight) {
-          paused = true;
-          setTimeout(() => {
-            if (tickerRef.current) tickerRef.current.scrollTop = 0;
-            paused = false;
-          }, 3000);
-        } else {
-          el.scrollTop += 0.4;
-        }
-      }
-      rafId = requestAnimationFrame(step);
-    };
-
-    rafId = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(rafId);
-  }, []);
-
-  // Keep the ticker's visual scroll position stable when a new check-in is
-  // prepended to the top — without this, new content pushing in from
-  // above would visually shove whatever's currently on screen downward.
-  useEffect(() => {
-    const el = tickerRef.current;
-    if (!el) return;
-    const newHeight = el.scrollHeight;
-    const diff = newHeight - prevScrollHeightRef.current;
-    if (diff > 0 && prevScrollHeightRef.current > 0) {
-      el.scrollTop += diff;
-    }
-    prevScrollHeightRef.current = newHeight;
-  }, [recentCheckIns]);
 
   const fetchData = async () => {
     try {
@@ -90,14 +46,16 @@ export default function CheckInDisplay() {
         const checkedInList = data.data
           .filter((r) => r.checkedIn)
           .sort((a, b) => new Date(b.checkInTime) - new Date(a.checkInTime))
-          //.slice(0, 30);
+          .slice(0, 15);
 
-        const topPerson = checkedInList[0] || null;
-        if (topPerson && topPerson._id !== latestSeenIdRef.current) {
-          // Persistent, not timed — stays accurate until someone genuinely
-          // newer replaces them.
-          setJustArrived(topPerson);
-          latestSeenIdRef.current = topPerson._id;
+        const newTopId = checkedInList[0]?._id || null;
+        if (newTopId && newTopId !== latestSeenIdRef.current) {
+          setJustArrivedId(newTopId);
+          latestSeenIdRef.current = newTopId;
+          // Clear the "NEW" badge after a moment, same principle as the
+          // check-in scanner's own success feedback — it's a brief pulse
+          // of "this just happened," not a persistent state.
+          setTimeout(() => setJustArrivedId(null), 8000);
         }
 
         setRecentCheckIns(checkedInList);
@@ -426,66 +384,6 @@ export default function CheckInDisplay() {
         </div>
       </div>
 
-      {/* Just Arrived - persistent spotlight, always shows the single most
-          recent check-in, updates instantly, no timer needed */}
-      <div
-        style={{
-          background: justArrived
-            ? "linear-gradient(135deg, #064e3b 0%, #047857 100%)"
-            : "linear-gradient(135deg, #1f2937 0%, #374151 100%)",
-          border: `2px solid ${justArrived ? "#10b981" : "#4b5563"}`,
-          borderRadius: "20px",
-          padding: "28px 36px",
-          marginBottom: "32px",
-          display: "flex",
-          alignItems: "center",
-          gap: "24px",
-          boxShadow: justArrived
-            ? "0 8px 40px rgba(16, 185, 129, 0.35)"
-            : "none",
-          transition: "all 0.4s ease",
-        }}
-      >
-        <div style={{ fontSize: "3.5rem" }}>{justArrived ? "🎉" : "⏳"}</div>
-        <div>
-          <div
-            style={{
-              fontSize: "1rem",
-              fontWeight: "700",
-              color: justArrived ? "#6ee7b7" : "#9ca3af",
-              textTransform: "uppercase",
-              letterSpacing: "2px",
-              marginBottom: "6px",
-            }}
-          >
-            Just Arrived
-          </div>
-          <div
-            style={{
-              fontSize: "2.5rem",
-              fontWeight: "800",
-              color: "#f9fafb",
-              lineHeight: "1.1",
-            }}
-          >
-            {justArrived ? justArrived.name : "Waiting for first check-in..."}
-          </div>
-          {justArrived && (
-            <div
-              style={{ fontSize: "1.1rem", color: "#9ca3af", marginTop: "6px" }}
-            >
-              👥{" "}
-              {justArrived.under5 +
-                justArrived.age5to12 +
-                justArrived.age12plus}{" "}
-              people
-              {justArrived.checkInBy &&
-                ` • checked in by ${justArrived.checkInBy}`}
-            </div>
-          )}
-        </div>
-      </div>
-
       <div
         style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "40px" }}
       >
@@ -727,10 +625,8 @@ export default function CheckInDisplay() {
               </div>
             </div>
 
-            {/* Scrolling Feed - auto-scrolls continuously via tickerRef,
-                independent of the spotlight panel above */}
+            {/* Scrolling Feed */}
             <div
-              ref={tickerRef}
               style={{
                 flex: 1,
                 overflowY: "auto",
@@ -770,56 +666,83 @@ export default function CheckInDisplay() {
                     <div
                       key={person._id}
                       style={{
-                        background: "#111827",
-                        borderRadius: "12px",
-                        padding: "14px 18px",
-                        marginBottom: "10px",
-                        border: "1px solid #374151",
+                        background:
+                          person._id === justArrivedId
+                            ? "linear-gradient(135deg, #064e3b 0%, #047857 100%)"
+                            : "#111827",
+                        borderRadius: "16px",
+                        padding: "24px",
+                        marginBottom: "16px",
+                        border: `2px solid ${
+                          person._id === justArrivedId ? "#10b981" : "#374151"
+                        }`,
+                        animation:
+                          person._id === justArrivedId
+                            ? "slideInRight 0.5s ease-out"
+                            : "none",
+                        boxShadow:
+                          person._id === justArrivedId
+                            ? "0 8px 32px rgba(16, 185, 129, 0.4)"
+                            : "none",
                       }}
                     >
                       <div
                         style={{
                           display: "flex",
                           justifyContent: "space-between",
-                          alignItems: "center",
-                          gap: "16px",
+                          alignItems: "flex-start",
+                          gap: "20px",
                         }}
                       >
-                        <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ flex: 1 }}>
                           <div
                             style={{
-                              fontSize: "1.15rem",
+                              fontSize: "1.75rem",
                               fontWeight: "700",
                               color: "#f9fafb",
-                              marginBottom: "4px",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
+                              marginBottom: "8px",
                             }}
                           >
                             {person.name}
                           </div>
-                          <div style={{ fontSize: "0.9rem", color: "#9ca3af" }}>
+                          <div
+                            style={{
+                              fontSize: "1.25rem",
+                              color: "#9ca3af",
+                              marginBottom: "8px",
+                            }}
+                          >
                             👥{" "}
                             {person.under5 + person.age5to12 + person.age12plus}{" "}
                             people
                           </div>
+                          <div
+                            style={{
+                              fontSize: "1rem",
+                              color: "#6b7280",
+                            }}
+                          >
+                            🕐 {timeText}
+                            {person.checkInBy && ` • by ${person.checkInBy}`}
+                          </div>
                         </div>
-                        <div
-                          style={{
-                            fontSize: "0.85rem",
-                            color: "#6b7280",
-                            whiteSpace: "nowrap",
-                            textAlign: "right",
-                          }}
-                        >
-                          🕐 {timeText}
-                          {person.checkInBy && (
-                            <div style={{ fontSize: "0.75rem" }}>
-                              by {person.checkInBy}
-                            </div>
-                          )}
-                        </div>
+
+                        {person._id === justArrivedId && (
+                          <div
+                            style={{
+                              background: "#10b981",
+                              padding: "8px 16px",
+                              borderRadius: "8px",
+                              fontSize: "1rem",
+                              fontWeight: "700",
+                              color: "white",
+                              whiteSpace: "nowrap",
+                              animation: "pulse 2s infinite",
+                            }}
+                          >
+                            NEW
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
