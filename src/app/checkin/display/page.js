@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useConfig } from "../../../contexts/ConfigContext";
 
 export default function CheckInDisplay() {
@@ -12,7 +12,7 @@ export default function CheckInDisplay() {
   const [lastMilestone, setLastMilestone] = useState(0);
   const [authError, setAuthError] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
-  const [latestSeenId, setLatestSeenId] = useState(null);
+  const latestSeenIdRef = useRef(null);
   const [justArrivedId, setJustArrivedId] = useState(null);
 
   // Update time every second
@@ -49,9 +49,9 @@ export default function CheckInDisplay() {
           .slice(0, 15);
 
         const newTopId = checkedInList[0]?._id || null;
-        if (newTopId && newTopId !== latestSeenId) {
+        if (newTopId && newTopId !== latestSeenIdRef.current) {
           setJustArrivedId(newTopId);
-          setLatestSeenId(newTopId);
+          latestSeenIdRef.current = newTopId;
           // Clear the "NEW" badge after a moment, same principle as the
           // check-in scanner's own success feedback — it's a brief pulse
           // of "this just happened," not a persistent state.
