@@ -261,7 +261,7 @@ export default function MealSelectionPage() {
                     >
                       •{" "}
                       {meal === "nuggets-chips"
-                        ? "🍗 Nuggets & Chips"
+                        ? "🍗 Chicken Wings & Chips"
                         : "❌ Not Required"}
                     </div>
                   ))}
@@ -285,8 +285,8 @@ export default function MealSelectionPage() {
                     >
                       •{" "}
                       {meal === "rice-curry"
-                        ? "🍛 Rice & Curry"
-                        : "🍔 Burger Meal"}
+                        ? "🍛 Biriyani"
+                        : "🍔 Burger, Chicken Wings & Chips"}
                     </div>
                   ))}
                 </div>
@@ -310,8 +310,8 @@ export default function MealSelectionPage() {
                     >
                       •{" "}
                       {meal === "rice-curry"
-                        ? "🍛 Rice & Curry"
-                        : "🍔 Burger Meal"}
+                        ? "🍛 Biriyani"
+                        : "🍔 Burger, Chicken Wings & Chips"}
                     </div>
                   ))}
                 </div>
@@ -422,7 +422,7 @@ export default function MealSelectionPage() {
                     >
                       •{" "}
                       {meal === "nuggets-chips"
-                        ? "🍗 Nuggets & Chips"
+                        ? "🍗 Chicken Wings & Chips"
                         : "❌ Not Required"}
                     </div>
                   ))}
@@ -447,8 +447,8 @@ export default function MealSelectionPage() {
                     >
                       •{" "}
                       {meal === "rice-curry"
-                        ? "🍛 Rice & Curry"
-                        : "🍔 Burger Meal"}
+                        ? "🍛 Biriyani"
+                        : "🍔 Burger, Chicken Wings & Chips"}
                     </div>
                   ))}
                 </div>
@@ -472,8 +472,8 @@ export default function MealSelectionPage() {
                     >
                       •{" "}
                       {meal === "rice-curry"
-                        ? "🍛 Rice & Curry"
-                        : "🍔 Burger Meal"}
+                        ? "🍛 Biriyani"
+                        : "🍔 Burger, Chicken Wings & Chips"}
                     </div>
                   ))}
                 </div>
@@ -626,7 +626,7 @@ export default function MealSelectionPage() {
                           color: "#f3f4f6",
                         }}
                       >
-                        🍗 Nuggets & Chips
+                        🍗 Chicken Wings & Chips
                       </span>
                     </label>
 
@@ -757,7 +757,7 @@ export default function MealSelectionPage() {
                           color: "#f3f4f6",
                         }}
                       >
-                        🍛 Rice & Curry
+                        🍛 Biriyani
                       </span>
                     </label>
 
@@ -800,7 +800,7 @@ export default function MealSelectionPage() {
                           color: "#f3f4f6",
                         }}
                       >
-                        🍔 Burger Meal
+                        🍔 Burger, Chicken Wings & Chips
                       </span>
                     </label>
                   </div>
@@ -888,7 +888,7 @@ export default function MealSelectionPage() {
                           color: "#f3f4f6",
                         }}
                       >
-                        🍛 Rice & Curry
+                        🍛 Biriyani
                       </span>
                     </label>
 
@@ -931,7 +931,7 @@ export default function MealSelectionPage() {
                           color: "#f3f4f6",
                         }}
                       >
-                        🍔 Burger Meal
+                        🍔 Burger, Chicken Wings & Chips
                       </span>
                     </label>
                   </div>

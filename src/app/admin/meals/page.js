@@ -273,12 +273,12 @@ ${config.organization.name} Team`;
     const headers = [
       "Family Name",
       "Phone",
-      "Under 5 - Nuggets",
+      "Under 5 - Chicken Wings & Chips",
       "Under 5 - Not Required",
-      "Age 5-11 - Rice & Curry",
-      "Age 5-11 - Burger Meal",
-      "Age 12+ - Rice & Curry",
-      "Age 12+ - Burger Meal",
+      "Age 5-11 - Biriyani",
+      "Age 5-11 - Burger, Chicken Wings & Chips",
+      "Age 12+ - Biriyani",
+      "Age 12+ - Burger, Chicken Wings & Chips",
       "Dietary Requirements",
       "Status",
       "Submitted At",
@@ -1070,7 +1070,7 @@ ${config.organization.name} Team`;
                     marginBottom: "8px",
                   }}
                 >
-                  Nuggets & Chips
+                  Chicken Wings & Chips
                 </div>
                 <div
                   style={{
@@ -1146,7 +1146,7 @@ ${config.organization.name} Team`;
                     marginBottom: "8px",
                   }}
                 >
-                  Rice & Curry
+                  Biriyani
                 </div>
                 <div
                   style={{
@@ -1183,7 +1183,7 @@ ${config.organization.name} Team`;
                     marginBottom: "8px",
                   }}
                 >
-                  Burger Meal
+                  Burger, Chicken Wings & Chips
                 </div>
                 <div
                   style={{
@@ -1222,7 +1222,7 @@ ${config.organization.name} Team`;
                     marginBottom: "8px",
                   }}
                 >
-                  Rice & Curry
+                  Biriyani
                 </div>
                 <div
                   style={{
@@ -1259,7 +1259,7 @@ ${config.organization.name} Team`;
                     marginBottom: "8px",
                   }}
                 >
-                  Burger Meal
+                  Burger, Chicken Wings & Chips
                 </div>
                 <div
                   style={{
@@ -1975,7 +1975,7 @@ ${config.organization.name} Team`;
                         >
                           •{" "}
                           {meal.mealChoice === "nuggets-chips"
-                            ? "🍗 Nuggets & Chips"
+                            ? "🍗 Chicken Wings & Chips"
                             : "❌ Not Required"}
                         </div>
                       ))}
@@ -2006,8 +2006,8 @@ ${config.organization.name} Team`;
                         >
                           •{" "}
                           {meal.mealChoice === "rice-curry"
-                            ? "🍛 Rice & Curry"
-                            : "🍔 Burger Meal"}
+                            ? "🍛 Biriyani"
+                            : "🍔 Burger, Chicken Wings & Chips"}
                         </div>
                       ))}
                   </div>
@@ -2037,8 +2037,8 @@ ${config.organization.name} Team`;
                         >
                           •{" "}
                           {meal.mealChoice === "rice-curry"
-                            ? "🍛 Rice & Curry"
-                            : "🍔 Burger Meal"}
+                            ? "🍛 Biriyani"
+                            : "🍔 Burger, Chicken Wings & Chips"}
                         </div>
                       ))}
                   </div>
