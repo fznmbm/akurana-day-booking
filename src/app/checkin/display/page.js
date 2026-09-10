@@ -458,7 +458,10 @@ export default function CheckInDisplay() {
               marginBottom: "6px",
             }}
           >
-            Just Arrived
+            {justArrived &&
+            Math.floor((currentTime - new Date(justArrived.checkInTime)) / 1000) > 120
+              ? "Last Arrival"
+              : "Just Arrived"}
           </div>
           <div
             style={{
