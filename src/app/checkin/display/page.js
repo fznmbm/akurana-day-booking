@@ -481,6 +481,19 @@ export default function CheckInDisplay() {
               people
               {justArrived.checkInBy &&
                 ` • checked in by ${justArrived.checkInBy}`}
+              {" • "}
+              {(() => {
+                const secondsAgo = Math.floor(
+                  (currentTime - new Date(justArrived.checkInTime)) / 1000,
+                );
+                if (secondsAgo < 60) return "just now";
+                if (secondsAgo < 3600)
+                  return `${Math.floor(secondsAgo / 60)}m ago`;
+                return new Date(justArrived.checkInTime).toLocaleTimeString(
+                  "en-GB",
+                  { hour: "2-digit", minute: "2-digit" },
+                );
+              })()}
             </div>
           )}
         </div>
