@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import dbConnect from "../../../lib/mongodb";
 import Rsvp from "../../../models/Rsvp";
 import { verifyAdminAuth } from "../../../lib/auth";
+import { notifyNewCheckIn } from "../../../lib/pusher";
 
 // GET - Get RSVP info by check-in code
 export async function GET(request) {
@@ -77,6 +78,11 @@ export async function POST(request) {
     );
 
     if (updated) {
+      // Fire-and-forget: don't make the volunteer wait on Pusher's network
+      // round trip before they get their success confirmation. Errors are
+      // caught inside notifyNewCheckIn itself, so this can't throw here.
+      notifyNewCheckIn();
+
       return NextResponse.json({
         success: true,
         message: `✅ ${updated.name} checked in successfully!`,

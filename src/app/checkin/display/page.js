@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useConfig } from "../../../contexts/ConfigContext";
+import PusherClient from "pusher-js";
 
 export default function CheckInDisplay() {
   const config = useConfig();
@@ -23,10 +24,30 @@ export default function CheckInDisplay() {
     return () => clearInterval(timer);
   }, []);
 
-  // Fetch data every 5 seconds
+  // Instant updates via Pusher — this is the primary path now.
+  useEffect(() => {
+    const pusherClient = new PusherClient(process.env.NEXT_PUBLIC_PUSHER_KEY, {
+      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
+    });
+    const channel = pusherClient.subscribe("checkins");
+    channel.bind("new-checkin", () => {
+      fetchData();
+    });
+
+    return () => {
+      channel.unbind_all();
+      pusherClient.unsubscribe("checkins");
+      pusherClient.disconnect();
+    };
+  }, []);
+
+  // Polling is now just a safety net, not the primary update path — if
+  // the real-time connection ever drops (venue WiFi, a firewall blocking
+  // WebSockets), the display still self-corrects within this interval
+  // instead of freezing indefinitely.
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 5000);
+    const interval = setInterval(fetchData, 20000);
     return () => clearInterval(interval);
   }, []);
 
@@ -690,7 +711,7 @@ export default function CheckInDisplay() {
               LIVE CHECK-IN ACTIVE
             </div>
             <div style={{ fontSize: "1rem", color: "#6ee7b7" }}>
-              Updates every 5 seconds
+              Live updates as check-ins happen
             </div>
           </div>
 
