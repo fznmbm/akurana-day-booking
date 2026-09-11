@@ -30,6 +30,22 @@ export default function CheckInDisplay() {
     return () => clearInterval(interval);
   }, []);
 
+  // Browsers throttle setInterval timers on background/unfocused tabs —
+  // this can make the clock and "Last Arrival" wording appear frozen if
+  // the screen briefly loses focus. Force an immediate resync the moment
+  // it's visible again, rather than waiting for the next regular tick.
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        setCurrentTime(new Date());
+        fetchData();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, []);
+
   // Continuous auto-scroll of the ticker — entirely decoupled from data
   // fetching and from the spotlight panel. Runs once, forever, quietly
   // looping through whatever the ticker currently contains.
@@ -203,10 +219,12 @@ export default function CheckInDisplay() {
       style={{
         minHeight: "100vh",
         background: "linear-gradient(135deg, #0a0e1a 0%, #1a1f3a 100%)",
-        padding: "40px",
+        padding: "clamp(16px, 3vw, 40px)",
         fontFamily: "system-ui, -apple-system, sans-serif",
         position: "relative",
-        overflow: "hidden",
+        overflowX: "hidden",
+        overflowY: "auto",
+        boxSizing: "border-box",
       }}
     >
       {/* Celebration Overlay */}
@@ -304,9 +322,11 @@ export default function CheckInDisplay() {
       <div
         style={{
           display: "flex",
+          flexWrap: "wrap",
           justifyContent: "space-between",
           alignItems: "flex-start",
-          marginBottom: "40px",
+          gap: "16px",
+          marginBottom: "clamp(20px, 3vw, 40px)",
         }}
       >
         {/* Left: Custom Layout */}
@@ -368,12 +388,11 @@ export default function CheckInDisplay() {
             <div>
               <p
                 style={{
-                  fontSize: "1.5rem",
+                  fontSize: "clamp(1rem, 2vw, 1.5rem)",
                   color: "#e0e7ff",
                   fontWeight: "600",
                   margin: 0,
                   letterSpacing: "0.5px",
-                  whiteSpace: "nowrap",
                 }}
               >
                 {config.event.fullName}
@@ -384,7 +403,7 @@ export default function CheckInDisplay() {
           {/* Bottom Row: Title */}
           <h1
             style={{
-              fontSize: "3.5rem",
+              fontSize: "clamp(1.75rem, 4.5vw, 3.5rem)",
               fontWeight: "900",
               color: "#f9fafb",
               margin: 0,
@@ -395,11 +414,11 @@ export default function CheckInDisplay() {
           </h1>
         </div>
 
-        {/* Right: Time/Date - Keep as is */}
+        {/* Right: Time/Date */}
         <div style={{ textAlign: "right" }}>
           <div
             style={{
-              fontSize: "3rem",
+              fontSize: "clamp(1.5rem, 4vw, 3rem)",
               fontWeight: "700",
               color: "#667eea",
               lineHeight: "1",
@@ -412,7 +431,7 @@ export default function CheckInDisplay() {
           </div>
           <div
             style={{
-              fontSize: "1.25rem",
+              fontSize: "clamp(0.85rem, 1.5vw, 1.25rem)",
               color: "#9ca3af",
               marginTop: "4px",
             }}
@@ -435,22 +454,25 @@ export default function CheckInDisplay() {
             : "linear-gradient(135deg, #1f2937 0%, #374151 100%)",
           border: `2px solid ${justArrived ? "#10b981" : "#4b5563"}`,
           borderRadius: "20px",
-          padding: "28px 36px",
-          marginBottom: "32px",
+          padding: "clamp(16px, 2.5vw, 28px) clamp(18px, 3vw, 36px)",
+          marginBottom: "clamp(20px, 3vw, 32px)",
           display: "flex",
+          flexWrap: "wrap",
           alignItems: "center",
-          gap: "24px",
+          gap: "clamp(14px, 2vw, 24px)",
           boxShadow: justArrived
             ? "0 8px 40px rgba(16, 185, 129, 0.35)"
             : "none",
           transition: "all 0.4s ease",
         }}
       >
-        <div style={{ fontSize: "3.5rem" }}>{justArrived ? "✅" : "⏳"}</div>
-        <div>
+        <div style={{ fontSize: "clamp(2rem, 4vw, 3.5rem)" }}>
+          {justArrived ? "✅" : "⏳"}
+        </div>
+        <div style={{ minWidth: 0 }}>
           <div
             style={{
-              fontSize: "1rem",
+              fontSize: "clamp(0.8rem, 1.2vw, 1rem)",
               fontWeight: "700",
               color: justArrived ? "#6ee7b7" : "#9ca3af",
               textTransform: "uppercase",
@@ -465,17 +487,22 @@ export default function CheckInDisplay() {
           </div>
           <div
             style={{
-              fontSize: "2.5rem",
+              fontSize: "clamp(1.4rem, 3vw, 2.5rem)",
               fontWeight: "800",
               color: "#f9fafb",
               lineHeight: "1.1",
+              wordBreak: "break-word",
             }}
           >
             {justArrived ? justArrived.name : "Waiting for first check-in..."}
           </div>
           {justArrived && (
             <div
-              style={{ fontSize: "1.1rem", color: "#9ca3af", marginTop: "6px" }}
+              style={{
+                fontSize: "clamp(0.85rem, 1.5vw, 1.1rem)",
+                color: "#9ca3af",
+                marginTop: "6px",
+              }}
             >
               👥{" "}
               {justArrived.under5 +
@@ -503,7 +530,12 @@ export default function CheckInDisplay() {
       </div>
 
       <div
-        style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "40px" }}
+        className="main-grid"
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 2fr",
+          gap: "clamp(20px, 3vw, 40px)",
+        }}
       >
         {/* Left Column - Progress */}
         <div>
@@ -512,7 +544,7 @@ export default function CheckInDisplay() {
             style={{
               background: "linear-gradient(135deg, #1f2937 0%, #374151 100%)",
               borderRadius: "24px",
-              padding: "60px",
+              padding: "clamp(24px, 4vw, 60px)",
               border: "2px solid #4b5563",
               marginBottom: "30px",
               position: "relative",
@@ -521,22 +553,24 @@ export default function CheckInDisplay() {
             {/* Circular Progress */}
             <div
               style={{
-                width: "400px",
-                height: "400px",
+                width: "100%",
+                maxWidth: "400px",
+                aspectRatio: "1 / 1",
                 margin: "0 auto",
                 position: "relative",
               }}
             >
               {/* Background Circle */}
               <svg
+                viewBox="0 0 400 400"
                 style={{
                   position: "absolute",
                   top: 0,
                   left: 0,
+                  width: "100%",
+                  height: "100%",
                   transform: "rotate(-90deg)",
                 }}
-                width="400"
-                height="400"
               >
                 <circle
                   cx="200"
@@ -587,7 +621,7 @@ export default function CheckInDisplay() {
               >
                 <div
                   style={{
-                    fontSize: "7rem",
+                    fontSize: "clamp(3rem, 8vw, 7rem)",
                     fontWeight: "900",
                     color: "#10b981",
                     lineHeight: "1",
@@ -598,7 +632,7 @@ export default function CheckInDisplay() {
                 </div>
                 <div
                   style={{
-                    fontSize: "2.5rem",
+                    fontSize: "clamp(1.25rem, 3vw, 2.5rem)",
                     fontWeight: "700",
                     color: "#f9fafb",
                     marginBottom: "8px",
@@ -608,7 +642,7 @@ export default function CheckInDisplay() {
                 </div>
                 <div
                   style={{
-                    fontSize: "1.25rem",
+                    fontSize: "clamp(0.85rem, 1.5vw, 1.25rem)",
                     color: "#9ca3af",
                     textTransform: "uppercase",
                     letterSpacing: "2px",
@@ -633,7 +667,7 @@ export default function CheckInDisplay() {
           >
             <div
               style={{
-                fontSize: "1.5rem",
+                fontSize: "clamp(1.1rem, 2vw, 1.5rem)",
                 color: "#10b981",
                 fontWeight: "700",
                 marginBottom: "8px",
@@ -641,6 +675,7 @@ export default function CheckInDisplay() {
                 alignItems: "center",
                 justifyContent: "center",
                 gap: "12px",
+                flexWrap: "wrap",
               }}
             >
               <div
@@ -699,12 +734,14 @@ export default function CheckInDisplay() {
         {/* Right Column - Live Feed */}
         <div>
           <div
+            className="ticker-card"
             style={{
               background: "linear-gradient(135deg, #1f2937 0%, #374151 100%)",
               borderRadius: "24px",
-              padding: "40px",
+              padding: "clamp(20px, 3vw, 40px)",
               border: "2px solid #4b5563",
               height: "calc(100vh - 280px)",
+              minHeight: "400px",
               display: "flex",
               flexDirection: "column",
             }}
@@ -712,16 +749,18 @@ export default function CheckInDisplay() {
             <div
               style={{
                 display: "flex",
+                flexWrap: "wrap",
                 justifyContent: "space-between",
                 alignItems: "center",
-                marginBottom: "32px",
-                paddingBottom: "24px",
+                gap: "12px",
+                marginBottom: "clamp(16px, 2.5vw, 32px)",
+                paddingBottom: "clamp(12px, 2vw, 24px)",
                 borderBottom: "2px solid #4b5563",
               }}
             >
               <h2
                 style={{
-                  fontSize: "2.5rem",
+                  fontSize: "clamp(1.4rem, 3vw, 2.5rem)",
                   fontWeight: "800",
                   color: "#f9fafb",
                   margin: 0,
@@ -732,9 +771,9 @@ export default function CheckInDisplay() {
               <div
                 style={{
                   background: "#10b981",
-                  padding: "12px 24px",
+                  padding: "10px 18px",
                   borderRadius: "12px",
-                  fontSize: "1.5rem",
+                  fontSize: "clamp(1rem, 1.8vw, 1.5rem)",
                   fontWeight: "700",
                   color: "white",
                 }}
@@ -861,6 +900,16 @@ export default function CheckInDisplay() {
 
       {/* CSS Animations */}
       <style jsx>{`
+        @media (max-width: 1100px) {
+          .main-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .ticker-card {
+            height: auto !important;
+            max-height: 60vh !important;
+          }
+        }
+
         @keyframes pulse {
           0%,
           100% {
