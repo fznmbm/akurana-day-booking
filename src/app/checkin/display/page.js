@@ -217,7 +217,7 @@ export default function CheckInDisplay() {
   const secondsSinceUpdate = lastUpdated
     ? Math.floor((currentTime - lastUpdated) / 1000)
     : null;
-  const isStale = secondsSinceUpdate !== null && secondsSinceUpdate > 15; // normal poll is every 5s
+  const isStale = secondsSinceUpdate !== null && secondsSinceUpdate > 90; // Pusher is the primary path; the 20s poll is just a fallback, so allow more than one full fallback cycle before flagging anything
 
   if (!stats) {
     return (
@@ -719,28 +719,25 @@ export default function CheckInDisplay() {
             <div
               style={{
                 marginTop: "16px",
-                padding: "12px",
+                padding: "10px",
                 borderRadius: "12px",
                 textAlign: "center",
-                background: isStale
-                  ? "rgba(239, 68, 68, 0.15)"
-                  : "rgba(107, 114, 128, 0.15)",
-                border: `1px solid ${isStale ? "#ef4444" : "#374151"}`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
               }}
             >
-              {isStale && (
-                <div
-                  style={{
-                    color: "#fca5a5",
-                    fontWeight: "700",
-                    fontSize: "0.9rem",
-                    marginBottom: "4px",
-                  }}
-                >
-                  ⚠️ Data may be out of date
-                </div>
-              )}
-              <div style={{ color: "#9ca3af", fontSize: "0.85rem" }}>
+              <div
+                style={{
+                  width: "8px",
+                  height: "8px",
+                  borderRadius: "50%",
+                  background: isStale ? "#f59e0b" : "#374151",
+                  flexShrink: 0,
+                }}
+              />
+              <div style={{ color: "#6b7280", fontSize: "0.8rem" }}>
                 Last updated:{" "}
                 {lastUpdated.toLocaleTimeString("en-GB", {
                   hour: "2-digit",
