@@ -980,7 +980,7 @@ const copyForWhatsApp = () => {
           )}
 
           {/* Volunteer Tools - Open in New Tab */}
-          
+
           {/* <div
             style={{
               display: "grid",
@@ -1548,27 +1548,28 @@ const copyForWhatsApp = () => {
             <div
               style={{
                 display: "flex",
-                flexDirection: "column",
+                flexDirection: "row",
                 gap: "8px",
+                width: "100%",
               }}
             >
               <button
                 onClick={() => window.open("/checkin", "_blank")}
                 style={{
-                  padding: "12px 20px",
+                  flex: 1,
+                  padding: "12px 8px",
                   background: "#10b981",
                   color: "white",
                   border: "none",
                   borderRadius: "8px",
                   fontWeight: "700",
                   cursor: "pointer",
-                  fontSize: "0.875rem",
-                  whiteSpace: "nowrap",
+                  fontSize: "clamp(0.75rem, 3vw, 0.875rem)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  gap: "8px",
-                  minWidth: "160px",
+                  gap: "6px",
+                  textAlign: "center",
                 }}
               >
                 📷 Volunteer Scanner
@@ -1577,20 +1578,20 @@ const copyForWhatsApp = () => {
               <button
                 onClick={() => window.open("/checkin/display", "_blank")}
                 style={{
-                  padding: "12px 20px",
+                  flex: 1,
+                  padding: "12px 8px",
                   background: "#667eea",
                   color: "white",
                   border: "none",
                   borderRadius: "8px",
                   fontWeight: "700",
                   cursor: "pointer",
-                  fontSize: "0.875rem",
-                  whiteSpace: "nowrap",
+                  fontSize: "clamp(0.75rem, 3vw, 0.875rem)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  gap: "8px",
-                  minWidth: "160px",
+                  gap: "6px",
+                  textAlign: "center",
                 }}
               >
                 📺 Public Display
