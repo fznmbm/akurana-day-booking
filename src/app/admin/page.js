@@ -980,7 +980,8 @@ const copyForWhatsApp = () => {
           )}
 
           {/* Volunteer Tools - Open in New Tab */}
-          <div
+          
+          {/* <div
             style={{
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
@@ -1018,7 +1019,7 @@ const copyForWhatsApp = () => {
             >
               📺 Display
             </button>
-          </div>
+          </div> */}
 
           {/* Logout */}
           <button
