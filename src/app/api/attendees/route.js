@@ -23,7 +23,7 @@ export async function GET() {
 
     // Get attendees (only paid ones for public display)
     const attendees = await Rsvp.find({ paymentStatus: "paid" })
-      .select("name under5 age5to12 age12plus createdAt")
+      .select("name organization under5 age5to12 age12plus createdAt")
       .sort({ createdAt: 1 });
 
     const totalPeople = attendees.reduce(
@@ -37,6 +37,7 @@ export async function GET() {
       rsvpEnabled: settings.rsvpEnabled,
       attendees: attendees.map((a) => ({
         name: a.name,
+        organization: a.organization || "",
         totalGuests: a.under5 + a.age5to12 + a.age12plus,
         registeredDate: a.createdAt,
       })),

@@ -66,6 +66,7 @@ const [selectedOrg, setSelectedOrg] = useState(null);
   const [deadlineInfo, setDeadlineInfo] = useState(null);
   const [loadingDeadline, setLoadingDeadline] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [attendeeOrgFilter, setAttendeeOrgFilter] = useState("all");
 
   // Fetch deadline and attendee info
   useEffect(() => {
@@ -706,30 +707,114 @@ const [selectedOrg, setSelectedOrg] = useState(null);
                     color: "#9ca3af",
                   }}
                 >
-                  <span
-                    style={{
-                      padding: "6px 12px",
-                      background: "#1f2937",
-                      borderRadius: "6px",
-                      fontWeight: "600",
-                      color: "#10b981",
-                    }}
-                  >
-                    {deadlineInfo.stats.totalPeople} People
-                  </span>
-                  <span style={{ color: "#4b5563" }}>•</span>
-                  <span
-                    style={{
-                      padding: "6px 12px",
-                      background: "#1f2937",
-                      borderRadius: "6px",
-                      fontWeight: "600",
-                      color: "#667eea",
-                    }}
-                  >
-                    {deadlineInfo.stats.totalFamilies} Families
-                  </span>
+                  {(() => {
+                    const filtered =
+                      attendeeOrgFilter === "all"
+                        ? deadlineInfo.attendees
+                        : deadlineInfo.attendees.filter(
+                            (a) => a.organization === attendeeOrgFilter,
+                          );
+                    const filteredPeople = filtered.reduce(
+                      (sum, a) => sum + a.totalGuests,
+                      0,
+                    );
+                    return (
+                      <>
+                        <span
+                          style={{
+                            padding: "6px 12px",
+                            background: "#1f2937",
+                            borderRadius: "6px",
+                            fontWeight: "600",
+                            color: "#10b981",
+                          }}
+                        >
+                          {filteredPeople} People
+                        </span>
+                        <span style={{ color: "#4b5563" }}>•</span>
+                        <span
+                          style={{
+                            padding: "6px 12px",
+                            background: "#1f2937",
+                            borderRadius: "6px",
+                            fontWeight: "600",
+                            color: "#667eea",
+                          }}
+                        >
+                          {filtered.length} Families
+                        </span>
+                      </>
+                    );
+                  })()}
                 </div>
+              </div>
+
+              {/* Organisation Filter */}
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(4, 1fr)",
+                  gap: "6px",
+                  marginBottom: "16px",
+                }}
+              >
+                {[
+                  {
+                    id: "all",
+                    label: "All",
+                    activeColor: "#ffffff",
+                    activeBg: "#667eea",
+                    activeBorder: "#667eea",
+                  },
+                  {
+                    id: "ahhc",
+                    label: "AHHC",
+                    activeColor: "#667eea",
+                    activeBg: "#1e3a5f",
+                    activeBorder: "#667eea",
+                  },
+                  {
+                    id: "auf",
+                    label: "AUF",
+                    activeColor: "#10b981",
+                    activeBg: "#064e3b",
+                    activeBorder: "#10b981",
+                  },
+                  {
+                    id: "awauk",
+                    label: "AWA-UK",
+                    activeColor: "#f59e0b",
+                    activeBg: "#3b1f0f",
+                    activeBorder: "#f59e0b",
+                  },
+                ].map((org) => (
+                  <button
+                    key={org.id}
+                    onClick={() => setAttendeeOrgFilter(org.id)}
+                    style={{
+                      padding: "8px 4px",
+                      background:
+                        attendeeOrgFilter === org.id
+                          ? org.activeBg
+                          : "#1f2937",
+                      border: `1px solid ${
+                        attendeeOrgFilter === org.id
+                          ? org.activeBorder
+                          : "#374151"
+                      }`,
+                      borderRadius: "8px",
+                      color:
+                        attendeeOrgFilter === org.id
+                          ? org.activeColor
+                          : "#9ca3af",
+                      fontWeight: "700",
+                      fontSize: "0.75rem",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {org.label}
+                  </button>
+                ))}
               </div>
 
               {/* Search Bar */}
@@ -773,13 +858,26 @@ const [selectedOrg, setSelectedOrg] = useState(null);
                 }}
               >
                 {deadlineInfo.attendees
-                  .filter((attendee) =>
-                    attendee.name
-                      .toLowerCase()
-                      .includes(searchQuery.toLowerCase()),
+                  .filter(
+                    (attendee) =>
+                      attendee.name
+                        .toLowerCase()
+                        .includes(searchQuery.toLowerCase()) &&
+                      (attendeeOrgFilter === "all" ||
+                        attendee.organization === attendeeOrgFilter),
                   )
                   .map((attendee, index) => {
                     const badgeStyle = getBadgeStyle(attendee.totalGuests);
+                    const orgLabels = {
+                      ahhc: "AHHC",
+                      auf: "AUF",
+                      awauk: "AWA-UK",
+                    };
+                    const orgColors = {
+                      ahhc: { bg: "#1e3a5f", text: "#667eea" },
+                      auf: { bg: "#064e3b", text: "#10b981" },
+                      awauk: { bg: "#3b1f0f", text: "#f59e0b" },
+                    };
                     return (
                       <div
                         key={index}
@@ -836,17 +934,42 @@ const [selectedOrg, setSelectedOrg] = useState(null);
                             </div>
                             <div
                               style={{
-                                color: "#9ca3af",
-                                fontSize: "0.75rem",
-                                whiteSpace: "nowrap",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "6px",
+                                marginTop: "2px",
                               }}
                             >
-                              {new Date(
-                                attendee.registeredDate,
-                              ).toLocaleDateString("en-GB", {
-                                day: "numeric",
-                                month: "short",
-                              })}
+                              {attendee.organization && (
+                                <span
+                                  style={{
+                                    padding: "1px 6px",
+                                    borderRadius: "4px",
+                                    fontSize: "0.65rem",
+                                    fontWeight: "700",
+                                    background:
+                                      orgColors[attendee.organization]?.bg,
+                                    color:
+                                      orgColors[attendee.organization]?.text,
+                                  }}
+                                >
+                                  {orgLabels[attendee.organization]}
+                                </span>
+                              )}
+                              <div
+                                style={{
+                                  color: "#9ca3af",
+                                  fontSize: "0.75rem",
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                {new Date(
+                                  attendee.registeredDate,
+                                ).toLocaleDateString("en-GB", {
+                                  day: "numeric",
+                                  month: "short",
+                                })}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -870,11 +993,14 @@ const [selectedOrg, setSelectedOrg] = useState(null);
               </div>
 
               {/* No Results Message */}
-              {searchQuery &&
-                deadlineInfo.attendees.filter((attendee) =>
-                  attendee.name
-                    .toLowerCase()
-                    .includes(searchQuery.toLowerCase()),
+              {(searchQuery || attendeeOrgFilter !== "all") &&
+                deadlineInfo.attendees.filter(
+                  (attendee) =>
+                    attendee.name
+                      .toLowerCase()
+                      .includes(searchQuery.toLowerCase()) &&
+                    (attendeeOrgFilter === "all" ||
+                      attendee.organization === attendeeOrgFilter),
                 ).length === 0 && (
                   <div
                     style={{
@@ -1434,7 +1560,7 @@ const [selectedOrg, setSelectedOrg] = useState(null);
                   value={formData.paymentProofReference}
                   onChange={handleChange}
                   required
-                  placeholder="e.g. the reference/name used in the bank transfer"
+                  placeholder="Reference/name used in the bank transfer"
                   style={{
                     width: "100%",
                     padding: "12px",
