@@ -251,7 +251,7 @@ Your booking:
 })()}
 
 JazakAllah Khair,
-${config.organization.name} Team`;
+Admin Team`;
 
     navigator.clipboard.writeText(message).then(() => {
       setMessage({ type: "success", text: "Copied! Opening WhatsApp..." });
