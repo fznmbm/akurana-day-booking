@@ -329,6 +329,7 @@ const [selectedOrg, setSelectedOrg] = useState(null);
           </p>
 
           {/* Organization Selection - Card Style */}
+          {!deadlinePassed && (
           <div style={{
             marginTop: "8px",
             paddingTop: "24px",
@@ -543,6 +544,7 @@ const [selectedOrg, setSelectedOrg] = useState(null);
               </div>
             )}
           </div>
+          )}
         </div>
 
         {/* Event Details Box */}
