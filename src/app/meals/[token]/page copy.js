@@ -616,7 +616,6 @@ export default function MealSelectionPage() {
                           width: "20px",
                           height: "20px",
                           cursor: "pointer",
-                          accentColor: "#3b82f6",
                         }}
                         required
                       />
@@ -661,7 +660,6 @@ export default function MealSelectionPage() {
                           width: "20px",
                           height: "20px",
                           cursor: "pointer",
-                          accentColor: "#3b82f6",
                         }}
                       />
                       <span
@@ -1130,7 +1128,6 @@ const styles = {
     fontWeight: "700",
     cursor: "pointer",
     transition: "all 0.2s",
-    boxShadow: "0 8px 20px rgba(16, 185, 129, 0.35)",
   },
 };
 
