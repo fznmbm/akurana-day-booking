@@ -47,7 +47,7 @@ export default function MealSelectionPage() {
         const under5Array = [];
         for (let i = 0; i < data.data.under5; i++) {
           const existing = under5Existing.find((m) => m.personIndex === i + 1);
-          under5Array.push(existing?.mealChoice || "nuggets-chips");
+          under5Array.push(existing?.mealChoice || null);
         }
         setUnder5Meals(under5Array);
 
@@ -60,7 +60,7 @@ export default function MealSelectionPage() {
           const existing = age5to12Existing.find(
             (m) => m.personIndex === i + 1
           );
-          age5to12Array.push(existing?.mealChoice || "rice-curry");
+                    age5to12Array.push(existing?.mealChoice || null);
         }
         setAge5to12Meals(age5to12Array);
 
@@ -73,7 +73,7 @@ export default function MealSelectionPage() {
           const existing = age12plusExisting.find(
             (m) => m.personIndex === i + 1
           );
-          age12plusArray.push(existing?.mealChoice || "rice-curry");
+          age12plusArray.push(existing?.mealChoice || null);
         }
         setAge12plusMeals(age12plusArray);
 
