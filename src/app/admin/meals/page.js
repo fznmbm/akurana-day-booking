@@ -229,7 +229,7 @@ export default function AdminMealsPage() {
 
     const message = `Assalamu Alaikum ${rsvp.name}!
 
-Thank you for confirming your payment for ${config.event.fullName}! 
+Thank you for confirming your booking for ${config.event.fullName}! 
 
 Please select meal choices for your family:
 ${mealLink}
