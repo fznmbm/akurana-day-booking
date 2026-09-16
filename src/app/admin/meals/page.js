@@ -331,7 +331,21 @@ Admin Team`;
       ];
     });
 
-    const csv = [headers, ...rows].map((row) => row.join(",")).join("\n");
+    // Proper CSV escaping (RFC 4180): any field containing a comma, a
+    // quote, or a newline must be wrapped in quotes, with internal quotes
+    // doubled. Without this, values like addresses or dates with commas
+    // silently shift every column after them.
+    const escapeCsvField = (value) => {
+      const str = String(value ?? "");
+      if (str.includes(",") || str.includes('"') || str.includes("\n")) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
+
+    const csv = [headers, ...rows]
+      .map((row) => row.map(escapeCsvField).join(","))
+      .join("\n");
     const BOM = "\uFEFF";
     const blob = new Blob([BOM + csv], { type: "text/csv;charset=utf-8;" });
     const url = window.URL.createObjectURL(blob);
