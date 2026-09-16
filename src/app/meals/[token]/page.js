@@ -978,7 +978,7 @@ export default function MealSelectionPage() {
         >
           <p style={{ color: "#6b7280", fontSize: "0.8rem", margin: 0 }}>
             Powered by{" "}
-            
+            <a
               href="https://elitestack.co.uk"
               target="_blank"
               rel="noopener noreferrer"
