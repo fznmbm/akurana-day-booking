@@ -1123,7 +1123,7 @@ const styles = {
     background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
     color: "white",
     border: "none",
-    borderRadius: "0 0 16px 16px",
+    borderRadius: "8px",
     fontSize: "1rem",
     fontWeight: "700",
     cursor: "pointer",
