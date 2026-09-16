@@ -273,7 +273,7 @@ Admin Team`;
     const headers = [
       "Family Name",
       "Phone",
-      "Under 5 - Chicken Wings & Chips",
+      "Under 5 - Chicken Nuggets & Chips",
       "Under 5 - Not Required",
       "Age 5-11 - Biriyani",
       "Age 5-11 - Burger, Chicken Wings & Chips",
@@ -1070,7 +1070,7 @@ Admin Team`;
                     marginBottom: "8px",
                   }}
                 >
-                  Chicken Wings & Chips
+                  Chicken Nuggets & Chips
                 </div>
                 <div
                   style={{
@@ -1975,7 +1975,7 @@ Admin Team`;
                         >
                           •{" "}
                           {meal.mealChoice === "nuggets-chips"
-                            ? "🍗 Chicken Wings & Chips"
+                            ? "🍗 Chicken Nuggets & Chips"
                             : "❌ Not Required"}
                         </div>
                       ))}

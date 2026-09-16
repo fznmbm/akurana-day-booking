@@ -261,7 +261,7 @@ export default function MealSelectionPage() {
                     >
                       •{" "}
                       {meal === "nuggets-chips"
-                        ? "🍗 Chicken Wings & Chips"
+                        ? "🍗 Chicken Nuggets & Chips"
                         : "❌ Not Required"}
                     </div>
                   ))}
@@ -422,7 +422,7 @@ export default function MealSelectionPage() {
                     >
                       •{" "}
                       {meal === "nuggets-chips"
-                        ? "🍗 Chicken Wings & Chips"
+                        ? "🍗 Chicken Nuggets & Chips"
                         : "❌ Not Required"}
                     </div>
                   ))}
@@ -626,7 +626,7 @@ export default function MealSelectionPage() {
                           color: "#f3f4f6",
                         }}
                       >
-                        🍗 Chicken Wings & Chips
+                        🍗 Chicken Nuggets & Chips
                       </span>
                     </label>
 
