@@ -969,6 +969,35 @@ export default function MealSelectionPage() {
             {submitting ? "⏳ Submitting..." : "✅ Submit Meal Selections"}
           </button>
         </form>
+
+        <div
+          style={{
+            textAlign: "center",
+            padding: "20px 16px",
+          }}
+        >
+          <p style={{ color: "#6b7280", fontSize: "0.8rem", margin: 0 }}>
+            Powered by{" "}
+            
+              href="https://elitestack.co.uk"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                color: "#667eea",
+                textDecoration: "none",
+                fontWeight: "600",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.textDecoration = "underline")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.textDecoration = "none")
+              }
+            >
+              EliteStack.co.uk
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   );
