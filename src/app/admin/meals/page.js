@@ -414,6 +414,14 @@ Admin Team`;
     }
   };
 
+  // Scoped to the selected organisation only (no search/status filter
+  // applied yet) — reused below so each filter button's count always
+  // matches what clicking it will actually show.
+  const orgFilteredForCounts =
+    organizationFilter === "all"
+      ? rsvps
+      : rsvps.filter((r) => r.organization === organizationFilter);
+
   const filteredRsvps = rsvps.filter((rsvp) => {
     // Search filter
     if (search) {
@@ -430,6 +438,7 @@ Admin Team`;
     // Status filter
     if (statusFilter === "completed" && !rsvp.mealSelectionComplete) return false;
     if (statusFilter === "pending" && rsvp.mealSelectionComplete) return false;
+    if (statusFilter === "allergies" && !rsvp.dietaryRestrictions) return false;
 
     return true;
   });
@@ -1334,7 +1343,7 @@ Admin Team`;
                 transition: "all 0.2s",
               }}
             >
-              All ({rsvps.length})
+              All ({orgFilteredForCounts.length})
             </button>
             <button
               onClick={() => setStatusFilter("completed")}
@@ -1351,7 +1360,8 @@ Admin Team`;
                 transition: "all 0.2s",
               }}
             >
-              ✅ Completed ({stats?.completed || 0})
+              ✅ Completed (
+              {orgFilteredForCounts.filter((r) => r.mealSelectionComplete).length})
             </button>
             <button
               onClick={() => setStatusFilter("pending")}
@@ -1367,7 +1377,26 @@ Admin Team`;
                 transition: "all 0.2s",
               }}
             >
-              ⏳ Pending ({stats?.pending || 0})
+              ⏳ Pending (
+              {orgFilteredForCounts.filter((r) => !r.mealSelectionComplete).length})
+            </button>
+            <button
+              onClick={() => setStatusFilter("allergies")}
+              style={{
+                padding: "8px 16px",
+                background:
+                  statusFilter === "allergies" ? "#ef4444" : "#374151",
+                color: "white",
+                border: "none",
+                borderRadius: "8px",
+                fontSize: "0.875rem",
+                fontWeight: "600",
+                cursor: "pointer",
+                transition: "all 0.2s",
+              }}
+            >
+              ⚠️ Allergies (
+              {orgFilteredForCounts.filter((r) => r.dietaryRestrictions).length})
             </button>
           </div>
         </div>
