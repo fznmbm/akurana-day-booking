@@ -402,18 +402,26 @@ export default function AdminDashboard() {
       `Looking forward to a wonderful Akurana Day together! 🎉\n\n` +
       `Akurana Day Organising Committee`;
 
-    const cleanPhone = rsvp.phone.replace(/\D/g, "");
-    const internationalPhone = cleanPhone.startsWith("0")
-      ? "44" + cleanPhone.slice(1)
-      : cleanPhone;
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    navigator.clipboard.writeText(message).then(() => {
+      setMessage({
+        type: "success",
+        text: "Agenda copied — if it doesn't appear correctly formatted, paste over it in the chat.",
+      });
+      setTimeout(() => setMessage({ type: "", text: "" }), 5000);
 
-    window.open(
-      isMobile
-        ? `whatsapp://send?phone=${internationalPhone}&text=${encodeURIComponent(message)}`
-        : `https://wa.me/${internationalPhone}?text=${encodeURIComponent(message)}`,
-      "_blank",
-    );
+      const cleanPhone = rsvp.phone.replace(/\D/g, "");
+      const internationalPhone = cleanPhone.startsWith("0")
+        ? "44" + cleanPhone.slice(1)
+        : cleanPhone;
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+      window.open(
+        isMobile
+          ? `whatsapp://send?phone=${internationalPhone}&text=${encodeURIComponent(message)}`
+          : `https://wa.me/${internationalPhone}?text=${encodeURIComponent(message)}`,
+        "_blank",
+      );
+    });
   };
 
   
