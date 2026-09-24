@@ -382,6 +382,39 @@ export default function AdminDashboard() {
     }
   };
 
+    const sendAgenda = (rsvp) => {
+    const message =
+      `📋 *AKURANA DAY AGENDA*\n\n` +
+      `Hi ${rsvp.name}, here's the schedule for Saturday:\n\n` +
+      `🗓️ *26th September 2026*\n\n` +
+      `1:00 PM – Registration\n` +
+      `2:00 PM – Lunch\n` +
+      `3:00 PM onwards – Sports Activities 🏃‍♂️🏏🏐⚽️\n` +
+      `   (Grounds: men & boys | Indoor sports hall: ladies & girls)\n` +
+      `4:30 PM – Asr Prayer 🕌\n` +
+      `5:00 PM – Tea ☕\n` +
+      `7:00 PM – Maghrib Prayer 🕌\n` +
+      `7:15 PM – Goodie Bags for Children\n` +
+      `8:00 PM – Cleaning & Tidying Up 🧹\n\n` +
+      `Looking forward to a wonderful Akurana Day together! 🎉\n\n` +
+      `Akurana Day Organising Committee`;
+
+    const cleanPhone = rsvp.phone.replace(/\D/g, "");
+    const internationalPhone = cleanPhone.startsWith("0")
+      ? "44" + cleanPhone.slice(1)
+      : cleanPhone;
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    window.open(
+      isMobile
+        ? `whatsapp://send?phone=${internationalPhone}&text=${encodeURIComponent(message)}`
+        : `https://wa.me/${internationalPhone}?text=${encodeURIComponent(message)}`,
+      "_blank",
+    );
+  };
+
+  
+
   const viewReceipt = async (rsvpId) => {
     try {
       const token = localStorage.getItem("adminToken");
@@ -2536,36 +2569,78 @@ const copyForWhatsApp = () => {
                           textAlign: "center",
                         }}
                       >
-                        <button
-                          onClick={() => deleteRsvp(rsvp._id)}
+                        <div
                           style={{
-                            width: "36px",
-                            height: "36px",
                             display: "flex",
-                            alignItems: "center",
+                            gap: "6px",
                             justifyContent: "center",
-                            background: "transparent",
-                            color: "#6b7280",
-                            border: "1px solid transparent",
-                            borderRadius: "6px",
-                            cursor: "pointer",
-                            fontSize: "1.125rem",
-                            transition: "all 0.2s ease",
                           }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.background = "#7f1d1d";
-                            e.currentTarget.style.borderColor = "#ef4444";
-                            e.currentTarget.style.color = "#ef4444";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.background = "transparent";
-                            e.currentTarget.style.borderColor = "transparent";
-                            e.currentTarget.style.color = "#6b7280";
-                          }}
-                          title="Delete RSVP"
                         >
-                          🗑️
-                        </button>
+                          {rsvp.paymentStatus === "paid" && (
+                            <button
+                              onClick={() => sendAgenda(rsvp)}
+                              style={{
+                                width: "36px",
+                                height: "36px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                background: "transparent",
+                                color: "#6b7280",
+                                border: "1px solid transparent",
+                                borderRadius: "6px",
+                                cursor: "pointer",
+                                fontSize: "1.125rem",
+                                transition: "all 0.2s ease",
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.background = "#064e3b";
+                                e.currentTarget.style.borderColor = "#10b981";
+                                e.currentTarget.style.color = "#10b981";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.background =
+                                  "transparent";
+                                e.currentTarget.style.borderColor =
+                                  "transparent";
+                                e.currentTarget.style.color = "#6b7280";
+                              }}
+                              title="Send Agenda"
+                            >
+                              📋
+                            </button>
+                          )}
+                          <button
+                            onClick={() => deleteRsvp(rsvp._id)}
+                            style={{
+                              width: "36px",
+                              height: "36px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              background: "transparent",
+                              color: "#6b7280",
+                              border: "1px solid transparent",
+                              borderRadius: "6px",
+                              cursor: "pointer",
+                              fontSize: "1.125rem",
+                              transition: "all 0.2s ease",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.background = "#7f1d1d";
+                              e.currentTarget.style.borderColor = "#ef4444";
+                              e.currentTarget.style.color = "#ef4444";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.background = "transparent";
+                              e.currentTarget.style.borderColor = "transparent";
+                              e.currentTarget.style.color = "#6b7280";
+                            }}
+                            title="Delete RSVP"
+                          >
+                            🗑️
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -2767,6 +2842,38 @@ const copyForWhatsApp = () => {
                             border: "1px solid #374151",
                           }}
                         >
+                          {rsvp.paymentStatus === "paid" && (
+                            <button
+                              onClick={() => {
+                                sendAgenda(rsvp);
+                                setActionMenuOpen(null);
+                              }}
+                              style={{
+                                width: "100%",
+                                padding: "10px 12px",
+                                background: "transparent",
+                                border: "none",
+                                textAlign: "left",
+                                cursor: "pointer",
+                                borderRadius: "6px",
+                                fontSize: "0.875rem",
+                                fontWeight: "500",
+                                color: "#10b981",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px",
+                              }}
+                              onMouseEnter={(e) =>
+                                (e.currentTarget.style.background = "#064e3b")
+                              }
+                              onMouseLeave={(e) =>
+                                (e.currentTarget.style.background =
+                                  "transparent")
+                              }
+                            >
+                              📋 Send Agenda
+                            </button>
+                          )}
                           <button
                             onClick={() => deleteRsvp(rsvp._id)}
                             style={{
