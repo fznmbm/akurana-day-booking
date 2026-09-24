@@ -389,13 +389,16 @@ export default function AdminDashboard() {
       `🗓️ *26th September 2026*\n\n` +
       `1:00 PM – Registration\n` +
       `2:00 PM – Lunch\n` +
-      `3:00 PM onwards – Sports Activities 🏃‍♂️🏏🏐⚽️\n` +
+      `3:30 PM onwards – Sports Activities 🏃‍♂️🏏🏐⚽️\n` +
       `   (Grounds: men & boys | Indoor sports hall: ladies & girls)\n` +
       `4:30 PM – Asr Prayer 🕌\n` +
       `5:00 PM – Tea ☕\n` +
       `7:00 PM – Maghrib Prayer 🕌\n` +
       `7:15 PM – Goodie Bags for Children\n` +
       `8:00 PM – Cleaning & Tidying Up 🧹\n\n` +
+      `*PLEASE NOTE:*\n` +
+      `✅ Those who ordered Burger meals, please collect your BURGER MEAL TOKEN at the entrance\n` +
+      `✅ It's parents' responsibility to look after their children\n\n` +
       `Looking forward to a wonderful Akurana Day together! 🎉\n\n` +
       `Akurana Day Organising Committee`;
 
