@@ -385,7 +385,7 @@ export default function AdminDashboard() {
     const sendAgenda = (rsvp) => {
     const message =
       `📋 *AKURANA DAY AGENDA*\n\n` +
-      `Hi ${rsvp.name}, here's the schedule for Saturday:\n\n` +
+      `Salam ${rsvp.name}, here's the schedule for Saturday:\n\n` +
       `🗓️ *26th September 2026*\n\n` +
       `1:00 PM – Registration\n` +
       `2:00 PM – Lunch\n` +
