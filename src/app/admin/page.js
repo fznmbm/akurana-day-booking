@@ -402,10 +402,14 @@ export default function AdminDashboard() {
       `Looking forward to a wonderful Akurana Day together! 🎉\n\n` +
       `Akurana Day Organising Committee`;
 
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
     navigator.clipboard.writeText(message).then(() => {
       setMessage({
         type: "success",
-        text: "Agenda copied — if it doesn't appear correctly formatted, paste over it in the chat.",
+        text: isMobile
+          ? "Agenda copied and WhatsApp opened — if formatting looks off, paste over it in the chat."
+          : "Agenda copied — paste it (Ctrl+V) into the WhatsApp chat that just opened.",
       });
       setTimeout(() => setMessage({ type: "", text: "" }), 5000);
 
@@ -413,12 +417,17 @@ export default function AdminDashboard() {
       const internationalPhone = cleanPhone.startsWith("0")
         ? "44" + cleanPhone.slice(1)
         : cleanPhone;
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
+      // Mobile: WhatsApp's native app decodes the pre-filled text
+      // reliably, so send it directly. Desktop: WhatsApp *Web*'s own
+      // text pre-fill is the unreliable part (not the clipboard copy
+      // above) — so open an empty chat instead of a broken-looking one,
+      // making "paste the message" the obvious next step rather than a
+      // risk of sending garbled text by mistake.
       window.open(
         isMobile
           ? `whatsapp://send?phone=${internationalPhone}&text=${encodeURIComponent(message)}`
-          : `https://wa.me/${internationalPhone}?text=${encodeURIComponent(message)}`,
+          : `https://wa.me/${internationalPhone}`,
         "_blank",
       );
 
