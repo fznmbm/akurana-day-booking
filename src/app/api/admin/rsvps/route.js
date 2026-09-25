@@ -71,6 +71,7 @@ export async function PUT(request) {
       mealSelectionToken,
       mealSelectionComplete,
       mealSelectionDeadline,
+      agendaSent,
     } = body;
 
     if (!id) {
@@ -102,6 +103,10 @@ export async function PUT(request) {
     }
     if (typeof mealSelectionComplete === "boolean")
       rsvp.mealSelectionComplete = mealSelectionComplete;
+    if (agendaSent === true) {
+      rsvp.agendaSent = true;
+      rsvp.agendaSentAt = new Date();
+    }
 
     // Save to trigger pre-save hook
     await rsvp.save();

@@ -56,6 +56,13 @@ const RsvpSchema = new mongoose.Schema({
     trim: true,
     default: "",
   },
+  agendaSent: {
+    type: Boolean,
+    default: false,
+  },
+  agendaSentAt: {
+    type: Date,
+  },
   receiptFileKey: {
     type: String,
     trim: true,

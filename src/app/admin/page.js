@@ -421,6 +421,19 @@ export default function AdminDashboard() {
           : `https://wa.me/${internationalPhone}?text=${encodeURIComponent(message)}`,
         "_blank",
       );
+
+      // Mark as sent so the admin table reflects it immediately. This
+      // records that you *initiated* the send, not that the guest has
+      // read it — there's no way to verify actual delivery from here.
+      const token = localStorage.getItem("adminToken");
+      fetch("/api/admin/rsvps", {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: rsvp._id, agendaSent: true }),
+      }).then(() => fetchRsvps());
     });
   };
 
@@ -2591,14 +2604,19 @@ const copyForWhatsApp = () => {
                             <button
                               onClick={() => sendAgenda(rsvp)}
                               style={{
+                                position: "relative",
                                 width: "36px",
                                 height: "36px",
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                background: "transparent",
-                                color: "#6b7280",
-                                border: "1px solid transparent",
+                                background: rsvp.agendaSent
+                                  ? "#064e3b"
+                                  : "transparent",
+                                color: rsvp.agendaSent ? "#10b981" : "#6b7280",
+                                border: `1px solid ${
+                                  rsvp.agendaSent ? "#10b981" : "transparent"
+                                }`,
                                 borderRadius: "6px",
                                 cursor: "pointer",
                                 fontSize: "1.125rem",
@@ -2610,15 +2628,37 @@ const copyForWhatsApp = () => {
                                 e.currentTarget.style.color = "#10b981";
                               }}
                               onMouseLeave={(e) => {
-                                e.currentTarget.style.background =
-                                  "transparent";
-                                e.currentTarget.style.borderColor =
-                                  "transparent";
-                                e.currentTarget.style.color = "#6b7280";
+                                e.currentTarget.style.background = rsvp.agendaSent
+                                  ? "#064e3b"
+                                  : "transparent";
+                                e.currentTarget.style.borderColor = rsvp.agendaSent
+                                  ? "#10b981"
+                                  : "transparent";
+                                e.currentTarget.style.color = rsvp.agendaSent
+                                  ? "#10b981"
+                                  : "#6b7280";
                               }}
-                              title="Send Agenda"
+                              title={
+                                rsvp.agendaSent
+                                  ? `Agenda sent — click to resend`
+                                  : "Send Agenda"
+                              }
                             >
                               📋
+                              {rsvp.agendaSent && (
+                                <span
+                                  style={{
+                                    position: "absolute",
+                                    top: "-2px",
+                                    right: "-2px",
+                                    width: "12px",
+                                    height: "12px",
+                                    background: "#10b981",
+                                    border: "2px solid #1f2937",
+                                    borderRadius: "50%",
+                                  }}
+                                />
+                              )}
                             </button>
                           )}
                           <button
@@ -2871,8 +2911,9 @@ const copyForWhatsApp = () => {
                                 fontWeight: "500",
                                 color: "#10b981",
                                 display: "flex",
-                                alignItems: "center",
-                                gap: "8px",
+                                flexDirection: "column",
+                                alignItems: "flex-start",
+                                gap: "2px",
                               }}
                               onMouseEnter={(e) =>
                                 (e.currentTarget.style.background = "#064e3b")
@@ -2882,9 +2923,27 @@ const copyForWhatsApp = () => {
                                   "transparent")
                               }
                             >
-                              📋 Send Agenda
+                              <span style={{ display: "flex", gap: "8px" }}>
+                                📋 {rsvp.agendaSent ? "Resend Agenda" : "Send Agenda"}
+                              </span>
+                              {rsvp.agendaSent && rsvp.agendaSentAt && (
+                                <span
+                                  style={{
+                                    fontSize: "0.7rem",
+                                    color: "#6b7280",
+                                    fontWeight: "400",
+                                  }}
+                                >
+                                  Sent{" "}
+                                  {new Date(rsvp.agendaSentAt).toLocaleString(
+                                    "en-GB",
+                                    { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" },
+                                  )}
+                                </span>
+                              )}
                             </button>
                           )}
+                        </div>
                           <button
                             onClick={() => deleteRsvp(rsvp._id)}
                             style={{
