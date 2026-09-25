@@ -2943,7 +2943,6 @@ const copyForWhatsApp = () => {
                               )}
                             </button>
                           )}
-                        </div>
                           <button
                             onClick={() => deleteRsvp(rsvp._id)}
                             style={{
