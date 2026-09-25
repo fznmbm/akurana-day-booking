@@ -284,7 +284,7 @@ Admin Team`;
       "Submitted At",
     ];
 
-    const rows = rsvps.map((rsvp) => {
+    const rows = filteredRsvps.map((rsvp) => {
       const under5Nuggets =
         rsvp.mealSelections?.filter(
           (m) => m.ageCategory === "under5" && m.mealChoice === "nuggets-chips",

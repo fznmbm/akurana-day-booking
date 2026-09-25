@@ -694,7 +694,7 @@ export default function AdminDashboard() {
       "Check-In Time", // ADD
       "Date",
     ];
-    const rows = rsvps.map((rsvp) => [
+    const rows = filteredRsvps.map((rsvp) => [
       rsvp.organization || "",
       rsvp.name,
       rsvp.phone,
@@ -733,7 +733,10 @@ export default function AdminDashboard() {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `ahhc-rsvps-${new Date().toISOString().split("T")[0]}.csv`;
+    const orgLabel = organizationFilter === "all" ? "all-orgs" : organizationFilter;
+    a.download = `akurana-rsvps-${orgLabel}-${
+      new Date().toISOString().split("T")[0]
+    }.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
   };
